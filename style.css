@@ -1,1 +1,14 @@
+/* Custom styles for truncation */
+.truncate-1-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
+/* Ensure modals are scrollable on smaller screens */
+.modal-scroll-y {
+    overflow-y: auto;
+    max-height: 90vh; /* Set a max-height for scrollable modals */
+}
