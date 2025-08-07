@@ -807,6 +807,10 @@
             const [categoryManagementError, setCategoryManagementError] = useState(null);
             const [isAddingCategory, setIsAddingCategory] = useState(false);
 
+            // MODIFICATION START: New state to manage the active tab
+            const [activeTab, setActiveTab] = useState('posts'); // 'posts' or 'categories'
+            // MODIFICATION END
+
             // Fetch all posts for admin view
             useEffect(() => {
                 if (!db || !isAdmin) { // Only fetch if user is admin
@@ -942,7 +946,7 @@
             return (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-3xl transform transition-all duration-300 scale-100 opacity-100 my-8">
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-bold text-gray-800">অ্যাডমিন প্যানেল</h2>
                             <button
                                 onClick={onClose}
@@ -961,151 +965,182 @@
                             </div>
                         )}
 
+                        {/* MODIFICATION START: Tab navigation */}
+                        <div className="border-b border-gray-200 mb-4">
+                            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                                <button
+                                    onClick={() => setActiveTab('posts')}
+                                    className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-base ${
+                                        activeTab === 'posts'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    সমস্ত পোস্ট
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('categories')}
+                                    className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-base ${
+                                        activeTab === 'categories'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    কাজের ধরণ ব্যবস্থাপনা
+                                </button>
+                            </nav>
+                        </div>
+                        {/* MODIFICATION END */}
+
                         {/* Content area that needs to scroll */}
-                        <div className="overflow-y-auto max-h-[calc(90vh-180px)]"> {/* Adjusted max-height for better fit */}
-                            {/* Job Category Management Section */}
-                            <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
-                                <h3 className="text-xl font-bold text-gray-800 mb-4">কাজের ধরণ ব্যবস্থাপনা</h3>
-                                {categoryManagementError && (
-                                    <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">
-                                        {categoryManagementError}
+                        <div className="overflow-y-auto max-h-[calc(90vh-220px)]"> {/* Adjusted max-height for better fit */}
+                            
+                            {/* MODIFICATION START: Conditional rendering based on active tab */}
+                            {activeTab === 'categories' && (
+                                <div className="p-2">
+                                    {categoryManagementError && (
+                                        <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">
+                                            {categoryManagementError}
+                                        </div>
+                                    )}
+                                    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+                                        <input
+                                            type="text"
+                                            value={newCategoryName}
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
+                                            placeholder="নতুন কাজের ধরণ যোগ করুন"
+                                            className="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                        />
+                                        <button
+                                            onClick={handleAddCategory}
+                                            disabled={isAddingCategory || !newCategoryName.trim()}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {isAddingCategory ? 'যোগ হচ্ছে...' : 'যোগ করুন'}
+                                        </button>
                                     </div>
-                                )}
-                                <div className="flex flex-col sm:flex-row gap-2 mb-4">
-                                    <input
-                                        type="text"
-                                        value={newCategoryName}
-                                        onChange={(e) => setNewCategoryName(e.target.value)}
-                                        placeholder="নতুন কাজের ধরণ যোগ করুন"
-                                        className="flex-grow px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                    />
-                                    <button
-                                        onClick={handleAddCategory}
-                                        disabled={isAddingCategory || !newCategoryName.trim()}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {isAddingCategory ? 'যোগ হচ্ছে...' : 'যোগ করুন'}
-                                    </button>
+                                    <div className="space-y-2">
+                                        {jobCategories.length > 0 ? (
+                                            jobCategories.map((category) => (
+                                                <div key={category.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-md shadow-sm border border-gray-100">
+                                                    <span className="text-gray-700 text-sm">{category.name}</span>
+                                                    <button
+                                                        onClick={() => handleDeleteCategory(category.id)}
+                                                        className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded-md transition duration-150 ease-in-out"
+                                                    >
+                                                        মুছে ফেলুন
+                                                    </button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-center text-gray-500 col-span-full py-4">কোনো কাজের ধরণ নেই।</p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {jobCategories.length > 0 ? (
-                                        jobCategories.map((category) => (
-                                            <div key={category.id} className="flex justify-between items-center bg-white p-2 rounded-md shadow-sm border border-gray-100">
-                                                <span className="text-gray-700 text-sm">{category.name}</span>
-                                                <button
-                                                    onClick={() => handleDeleteCategory(category.id)}
-                                                    className="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded-md transition duration-150 ease-in-out"
-                                                >
-                                                    মুছে ফেলুন
-                                                </button>
-                                            </div>
-                                        ))
+                            )}
+
+                            {activeTab === 'posts' && (
+                                <div>
+                                    {/* Filter controls */}
+                                    <div className="mb-4 flex flex-wrap gap-2 sm:space-x-4">
+                                        <button
+                                            onClick={() => setFilterStatus('all')}
+                                            className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                        >
+                                            সব পোস্ট
+                                        </button>
+                                        <button
+                                            onClick={() => setFilterStatus('pending')}
+                                            className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                        >
+                                            পেন্ডিং পোস্ট
+                                        </button>
+                                        <button
+                                            onClick={() => setFilterStatus('approved')}
+                                            className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                        >
+                                            অনুমোদিত পোস্ট
+                                        </button>
+                                        <button
+                                            onClick={() => setFilterStatus('rejected')}
+                                            className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
+                                        >
+                                            প্রত্যাখ্যাত পোস্ট
+                                        </button>
+                                    </div>
+
+                                    {loadingAllPosts ? (
+                                        <div className="text-center py-4">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                                            <p className="text-gray-600">সমস্ত পোস্ট লোড হচ্ছে...</p>
+                                        </div>
+                                    ) : allPosts.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {allPosts.map((post) => (
+                                                <div key={post.id} className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
+                                                    {post.postType === 'job_sender' ? (
+                                                        <>
+                                                            <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
+                                                            <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
+                                                            <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
+                                                            <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
+                                                            {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
+                                                            <p className="text-sm text-gray-700 mt-1">{post.description}</p>
+                                                            {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
+                                                            <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
+                                                            <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
+                                                            <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
+                                                            {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
+                                                            {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
+                                                            <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
+                                                        </>
+                                                    )}
+                                                    <p className="text-xs text-gray-500 mt-3">পোস্ট করেছেন: {post.userName || post.postedBy}</p>
+                                                    {post.timestamp && (
+                                                        <p className="text-xs text-gray-500">
+                                                            পোস্ট করা হয়েছে: {formatTimeAgo(post.timestamp)}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-sm mt-2">স্ট্যাটাস: <span className={`font-semibold ${post.status === 'approved' ? 'text-green-500' : post.status === 'pending' ? 'text-yellow-500' : 'text-red-500'}`}>{post.status === 'pending' ? 'পেন্ডিং' : post.status === 'approved' ? 'অনুমোদিত' : 'প্রত্যাখ্যাত'}</span></p>
+
+                                                    <div className="flex flex-wrap justify-end gap-2 mt-3">
+                                                        {post.status === 'pending' && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => updatePostStatus(post.id, 'approved')}
+                                                                    className="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
+                                                                >
+                                                                    অনুমোদন করুন
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => updatePostStatus(post.id, 'rejected')}
+                                                                    className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
+                                                                >
+                                                                    প্রত্যাখ্যান করুন
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                        <button
+                                                            onClick={() => handleDeleteClick(post.id)}
+                                                            className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
+                                                        >
+                                                            মুছে ফেলুন (অ্যাডমিন)
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
-                                        <p className="text-center text-gray-500 col-span-full">কোনো কাজের ধরণ নেই।</p>
+                                        <p className="text-center text-gray-500 py-4">কোনো পোস্ট পাওয়া যায়নি।</p>
                                     )}
                                 </div>
-                            </div>
-
-                            <h3 className="text-xl font-bold text-gray-800 mb-4">সমস্ত পোস্ট</h3>
-
-                            {/* Filter controls */}
-                            <div className="mb-4 flex flex-wrap gap-2 sm:space-x-4">
-                                <button
-                                    onClick={() => setFilterStatus('all')}
-                                    className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                                >
-                                    সব পোস্ট
-                                </button>
-                                <button
-                                    onClick={() => setFilterStatus('pending')}
-                                    className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                                >
-                                    পেন্ডিং পোস্ট
-                                </button>
-                                <button
-                                    onClick={() => setFilterStatus('approved')}
-                                    className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                                >
-                                    অনুমোদিত পোস্ট
-                                </button>
-                                <button
-                                    onClick={() => setFilterStatus('rejected')}
-                                    className={`py-2 px-4 rounded-md text-sm font-medium ${filterStatus === 'rejected' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                                >
-                                    প্রত্যাখ্যাত পোস্ট
-                                </button>
-                            </div>
-
-                            {loadingAllPosts ? (
-                                <div className="text-center py-4">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                                    <p className="text-gray-600">সমস্ত পোস্ট লোড হচ্ছে...</p>
-                                </div>
-                            ) : allPosts.length > 0 ? (
-                                <div className="space-y-4">
-                                    {allPosts.map((post) => (
-                                        <div key={post.id} className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
-                                            {post.postType === 'job_sender' ? (
-                                                <>
-                                                    <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                    <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
-                                                    <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
-                                                    <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
-                                                    <p className="text-sm text-gray-700 mt-1">{post.description}</p>
-                                                    {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
-                                                    <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                    {/* MODIFICATION END */}
-                                                    <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
-                                                    <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
-                                                    <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
-                                                    {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
-                                                    <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
-                                                </>
-                                            )}
-                                            <p className="text-xs text-gray-500 mt-3">পোস্ট করেছেন: {post.userName || post.postedBy}</p>
-                                            {post.timestamp && (
-                                                <p className="text-xs text-gray-500">
-                                                    পোস্ট করা হয়েছে: {formatTimeAgo(post.timestamp)}
-                                                </p>
-                                            )}
-                                            <p className="text-sm mt-2">স্ট্যাটাস: <span className={`font-semibold ${post.status === 'approved' ? 'text-green-500' : post.status === 'pending' ? 'text-yellow-500' : 'text-red-500'}`}>{post.status === 'pending' ? 'পেন্ডিং' : post.status === 'approved' ? 'অনুমোদিত' : 'প্রত্যাখ্যাত'}</span></p>
-
-                                            <div className="flex flex-wrap justify-end gap-2 mt-3">
-                                                {post.status === 'pending' && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => updatePostStatus(post.id, 'approved')}
-                                                            className="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
-                                                        >
-                                                            অনুমোদন করুন
-                                                        </button>
-                                                        <button
-                                                            onClick={() => updatePostStatus(post.id, 'rejected')}
-                                                            className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
-                                                        >
-                                                            প্রত্যাখ্যান করুন
-                                                        </button>
-                                                    </>
-                                                )}
-                                                <button
-                                                    onClick={() => handleDeleteClick(post.id)}
-                                                    className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
-                                                >
-                                                    মুছে ফেলুন (অ্যাডমিন)
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-center text-gray-500">কোনো পোস্ট পাওয়া হয়নি।</p>
                             )}
+                            {/* MODIFICATION END */}
+
                         </div> {/* End of scrollable content area */}
                     </div>
                 </div>
