@@ -1837,10 +1837,17 @@
                                             </>
                                         ) : (
                                             <>
-                                                <h3 className="text-xl font-bold text-purple-700 mb-2">চাকরি খুঁজছি: {post.desiredJobTitle}</h3>
+                                                {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
+                                                <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
+                                                {/* MODIFICATION END */}
+
                                                 {/* Display Number of Team Members */}
                                                 <p className="text-gray-600 mb-1"><strong>কর্মী আছে:</strong> {post.numTeamMembers} জন</p>
-                                                <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
+
+                                                {/* MODIFICATION START: Changed "বিভাগ" to "জেলা" */}
+                                                <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
+                                                {/* MODIFICATION END */}
+                                                
                                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
                                                 {post.expectedSalary && <p className="text-green-600 font-semibold">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
                                                 <p className="text-gray-700 mt-3 truncate-1-line">{post.bioSummary}</p> {/* Truncate here */}
