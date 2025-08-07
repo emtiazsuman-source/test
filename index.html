@@ -335,8 +335,8 @@
                 // Validate and collect data based on the selected post type
                 if (postType === 'job_sender') {
                     // Required fields for job posting
-                    // Changed validation from company to numWorkersNeeded, description is now optional
-                    if (!jobTitle || !numWorkersNeeded || !mobileNumber) { // mobileNumber is now required
+                    // Changed validation from company to numWorkersNeeded
+                    if (!jobTitle || !numWorkersNeeded || !description || !mobileNumber) { // mobileNumber is now required
                         setFormError("অনুগ্রহ করে সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন (চাকরি পোস্ট)।");
                         return;
                     }
@@ -649,6 +649,7 @@
         /**
          * UserProfileModal component to display user's profile and their posts.
          * Allows users to view, edit, and delete their own posts.
+         * MODIFICATION: Made the posts list scrollable on smaller screens.
          */
         function UserProfileModal({ onClose, userId, userFullName, db, onEditPost, onDeletePost }) {
             const [userPosts, setUserPosts] = useState([]);
@@ -686,11 +687,9 @@
 
             // Handle delete confirmation
             const handleDeleteClick = async (postId) => {
-                // In a real application, you'd use a custom modal for confirmation
                 if (window.confirm("আপনি কি নিশ্চিত যে আপনি এই পোস্টটি মুছে ফেলতে চান?")) {
                     try {
                         await onDeletePost(postId);
-                        // No need to update state here, onSnapshot will handle it
                     } catch (e) {
                         setProfileError("পোস্ট মোছা যায়নি: " + e.message);
                     }
@@ -698,92 +697,95 @@
             };
 
             return (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 overflow-y-auto">
-                    <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl transform transition-all duration-300 scale-100 opacity-100 my-8">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800">আমার প্রোফাইল</h2>
-                            <button
-                                onClick={onClose}
-                                className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full p-1 transition duration-150 ease-in-out"
-                                aria-label="ফর্ম বন্ধ করুন"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl transform transition-all duration-300 scale-100 opacity-100 my-8 flex flex-col max-h-[90vh]">
+                        <div className="flex-shrink-0">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-gray-800">আমার প্রোফাইল</h2>
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full p-1 transition duration-150 ease-in-out"
+                                    aria-label="ফর্ম বন্ধ করুন"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {profileError && (
+                                <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">
+                                    {profileError}
+                                </div>
+                            )}
+
+                            <div className="mb-6">
+                                <p className="text-lg font-semibold text-gray-700">নাম: {userFullName || "N/A"}</p>
+                                <p className="text-sm text-gray-500">ইউজার আইডি: {userId}</p>
+                            </div>
+
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">আমার পোস্টসমূহ</h3>
                         </div>
 
-                        {profileError && (
-                            <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">
-                                {profileError}
-                            </div>
-                        )}
-
-                        <div className="mb-6">
-                            <p className="text-lg font-semibold text-gray-700">নাম: {userFullName || "N/A"}</p>
-                            <p className="text-sm text-gray-500">ইউজার আইডি: {userId}</p>
-                        </div>
-
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">আমার পোস্টসমূহ</h3>
-                        {loadingUserPosts ? (
-                            <div className="text-center py-4">
-                                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                                <p className="text-gray-600">পোস্ট লোড হচ্ছে...</p>
-                            </div>
-                        ) : userPosts.length > 0 ? (
-                            <div className="space-y-4">
-                                {userPosts.map((post) => (
-                                    <div key={post.id} className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
-                                        {post.postType === 'job_sender' ? (
-                                            <>
-                                                <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                {/* Display Number of Workers Needed */}
-                                                <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
-                                                <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
-                                                <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
-                                                <p className="text-sm text-gray-700 mt-1">{post.description}</p>
-                                                {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
-                                            </>
-                                        ) : (
-                                            <>
-                                                {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
-                                                <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                {/* MODIFICATION END */}
-                                                <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
-                                                <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
-                                                <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
-                                                {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
-                                                <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
-                                            </>
-                                        )}
-                                        <p className="text-xs text-gray-500 mt-3">স্ট্যাটাস: <span className={`font-semibold ${post.status === 'approved' ? 'text-green-500' : post.status === 'pending' ? 'text-yellow-500' : 'text-red-500'}`}>{post.status === 'pending' ? 'পেন্ডিং' : post.status === 'approved' ? 'অনুমোদিত' : 'প্রত্যাখ্যাত'}</span></p>
-                                        {post.timestamp && (
-                                            <p className="text-xs text-gray-500">
-                                                পোস্ট করা হয়েছে: {formatTimeAgo(post.timestamp)}
-                                            </p>
-                                        )}
-                                        <div className="flex justify-end space-x-2 mt-3">
-                                            <button
-                                                onClick={() => onEditPost(post)}
-                                                className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
-                                            >
-                                                সম্পাদনা করুন
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteClick(post.id)}
-                                                className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
-                                            >
-                                                মুছে ফেলুন
-                                            </button>
+                        {/* Scrollable Content Area */}
+                        <div className="flex-grow overflow-y-auto pr-2">
+                            {loadingUserPosts ? (
+                                <div className="text-center py-4">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                                    <p className="text-gray-600">পোস্ট লোড হচ্ছে...</p>
+                                </div>
+                            ) : userPosts.length > 0 ? (
+                                <div className="space-y-4">
+                                    {userPosts.map((post) => (
+                                        <div key={post.id} className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
+                                            {post.postType === 'job_sender' ? (
+                                                <>
+                                                    <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
+                                                    <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
+                                                    <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
+                                                    <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
+                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
+                                                    <p className="text-sm text-gray-700 mt-1">{post.description}</p>
+                                                    {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
+                                                    <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
+                                                    <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
+                                                    <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
+                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
+                                                    {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
+                                                    <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
+                                                </>
+                                            )}
+                                            <p className="text-xs text-gray-500 mt-3">স্ট্যাটাস: <span className={`font-semibold ${post.status === 'approved' ? 'text-green-500' : post.status === 'pending' ? 'text-yellow-500' : 'text-red-500'}`}>{post.status === 'pending' ? 'পেন্ডিং' : post.status === 'approved' ? 'অনুমোদিত' : 'প্রত্যাখ্যাত'}</span></p>
+                                            {post.timestamp && (
+                                                <p className="text-xs text-gray-500">
+                                                    পোস্ট করা হয়েছে: {formatTimeAgo(post.timestamp)}
+                                                </p>
+                                            )}
+                                            <div className="flex justify-end space-x-2 mt-3">
+                                                <button
+                                                    onClick={() => onEditPost(post)}
+                                                    className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
+                                                >
+                                                    সম্পাদনা করুন
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteClick(post.id)}
+                                                    className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-150 ease-in-out"
+                                                >
+                                                    মুছে ফেলুন
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-center text-gray-500">আপনার কোনো পোস্ট নেই।</p>
-                        )}
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-center text-gray-500 py-10">আপনার কোনো পোস্ট নেই।</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             );
