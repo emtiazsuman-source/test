@@ -1,3 +1,4 @@
+``html
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -378,8 +379,7 @@
                         await onUpdateJob(initialData.id, { ...jobData, status: 'pending' });
                     } else {
                         // Otherwise, it's an add operation
-                        // New posts start with 'pending' status
-                        await onAddJob({ ...jobData, status: 'pending' });
+                        await onAddJob({ ...jobData });
                     }
                     setShowConfirmation(true); // Show confirmation message
                     // Automatically close the form after a short delay
@@ -738,23 +738,20 @@
                                         {post.postType === 'job_sender' ? (
                                             <>
                                                 <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                {/* Display Number of Workers Needed */}
                                                 <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
                                                 <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                 <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
+                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
                                                 <p className="text-sm text-gray-700 mt-1">{post.description}</p>
                                                 {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
                                             </>
                                         ) : (
                                             <>
-                                                {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
                                                 <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                {/* MODIFICATION END */}
                                                 <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
                                                 <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                 <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
+                                                {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
                                                 {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
                                                 <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
                                             </>
@@ -806,9 +803,14 @@
             const [categoryManagementError, setCategoryManagementError] = useState(null);
             const [isAddingCategory, setIsAddingCategory] = useState(false);
 
+            // MODIFICATION START: State for Auto-Approve setting
+            const [isAutoApproveEnabled, setIsAutoApproveEnabled] = useState(false);
+            const [settingsLoading, setSettingsLoading] = useState(true);
+            // MODIFICATION END
+
             // Fetch all posts for admin view
             useEffect(() => {
-                if (!db || !isAdmin) { // Only fetch if user is admin
+                if (!db || !isAdmin) { 
                     setLoadingAllPosts(false);
                     return;
                 }
@@ -859,6 +861,50 @@
 
                 return () => unsubscribe();
             }, [db, isAdmin]);
+            
+            // MODIFICATION START: Fetch and listen to auto-approve setting
+            useEffect(() => {
+                if (!db || !isAdmin) {
+                    setSettingsLoading(false);
+                    return;
+                }
+                setSettingsLoading(true);
+                const settingsRef = window.doc(db, `artifacts/${window.canvasAppId}/public/settings`, 'autoApprove');
+                
+                const unsubscribe = window.onSnapshot(settingsRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().enabled) {
+                        setIsAutoApproveEnabled(true);
+                    } else {
+                        setIsAutoApproveEnabled(false);
+                    }
+                    setSettingsLoading(false);
+                }, (e) => {
+                    console.error("Error fetching settings:", e);
+                    setAdminError("সেটিংস লোড করতে সমস্যা হয়েছে।");
+                    setSettingsLoading(false);
+                });
+
+                return () => unsubscribe();
+            }, [db, isAdmin]);
+            
+            // Function to toggle auto-approval setting
+            const handleToggleAutoApprove = async () => {
+                if (!db || !isAdmin) {
+                    setAdminError("আপনার এই কাজটি করার অনুমতি নেই।");
+                    return;
+                }
+                const newStatus = !isAutoApproveEnabled;
+                try {
+                    const settingsRef = window.doc(db, `artifacts/${window.canvasAppId}/public/settings`, 'autoApprove');
+                    await window.setDoc(settingsRef, { enabled: newStatus }, { merge: true });
+                    // State will update automatically via the onSnapshot listener
+                } catch (e) {
+                    console.error("Error updating auto-approve setting:", e);
+                    setAdminError("অটো-অ্যাপ্রুভাল সেটিংস আপডেট করতে সমস্যা হয়েছে।");
+                }
+            };
+            // MODIFICATION END
+
 
             // Function to add a new category
             const handleAddCategory = async () => {
@@ -961,7 +1007,33 @@
                         )}
 
                         {/* Content area that needs to scroll */}
-                        <div className="overflow-y-auto max-h-[calc(90vh-180px)]"> {/* Adjusted max-height for better fit */}
+                        <div className="overflow-y-auto max-h-[calc(90vh-180px)]"> 
+                            {/* MODIFICATION START: Auto-Approve Settings Section */}
+                            <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
+                                <h3 className="text-xl font-bold text-gray-800 mb-4">সেটিংস</h3>
+                                {settingsLoading ? (
+                                     <p className="text-gray-600">সেটিংস লোড হচ্ছে...</p>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-700 font-medium">পোস্ট অটো-অ্যাপ্রুভাল</span>
+                                            <button
+                                                onClick={handleToggleAutoApprove}
+                                                className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isAutoApproveEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
+                                            >
+                                                <span
+                                                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ease-in-out ${isAutoApproveEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                                                />
+                                            </button>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-2">
+                                            এটি চালু থাকলে, নতুন সব পোস্ট পর্যালোচনার জন্য পেন্ডিং না থেকে সরাসরি অ্যাপ্রুভ হয়ে যাবে।
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                            {/* MODIFICATION END */}
+
                             {/* Job Category Management Section */}
                             <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
                                 <h3 className="text-xl font-bold text-gray-800 mb-4">কাজের ধরণ ব্যবস্থাপনা</h3>
@@ -1050,19 +1122,17 @@
                                                     <p className="text-sm text-gray-600">শ্রমিক লাগবে: {post.numWorkersNeeded} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
+                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
                                                     <p className="text-sm text-gray-700 mt-1">{post.description}</p>
                                                     {post.salary && <p className="text-green-600 text-sm">বেতন: {post.salary} টাকা</p>}
                                                 </>
                                             ) : (
                                                 <>
-                                                    {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
                                                     <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                    {/* MODIFICATION END */}
                                                     <p className="text-sm text-gray-600">কর্মী আছে: {post.numTeamMembers} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
-                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>} {/* Display mobile number */}
+                                                    {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
                                                     {post.expectedSalary && <p className="text-green-600 text-sm">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
                                                     <p className="text-sm text-gray-700 mt-1">{post.bioSummary}</p>
                                                 </>
@@ -1157,9 +1227,7 @@
                             </>
                         ) : (
                             <>
-                                {/* MODIFICATION START: Removed "চাকরি খুঁজছি: " from the title */}
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
-                                {/* MODIFICATION END */}
                                 <p className="text-gray-600 mb-1"><strong>কর্মী আছে:</strong> {post.numTeamMembers} জন</p>
                                 <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
@@ -1205,44 +1273,38 @@
             const [userRole, setUserRole] = useState('user'); // New state for user role, default to 'user'
             const [posts, setPosts] = useState([]); // Stores fetched job posts/seeker profiles
             const [loading, setLoading] = useState(true);
-            // Initialize showAuthModal to false so it doesn't appear automatically
-            const [showAuthModal, setShowAuthModal] = useState(false); // Controls visibility of the AuthForm modal
+            const [showAuthModal, setShowAuthModal] = useState(false); 
             const [error, setError] = useState(null);
-            const [showPostForm, setShowPostForm] = useState(false); // Controls visibility of the PostJobForm modal
-            const [showProfileModal, setShowProfileModal] = useState(false); // Controls visibility of the UserProfileModal
-            const [showAdminPanel, setShowAdminPanel] = useState(false); // Controls visibility of the AdminPanelModal
-            const [editingPost, setEditingPost] = useState(null); // Stores the post data when editing
-            const [jobCategories, setJobCategories] = useState([]); // State for dynamic job categories
+            const [showPostForm, setShowPostForm] = useState(false); 
+            const [showProfileModal, setShowProfileModal] = useState(false); 
+            const [showAdminPanel, setShowAdminPanel] = useState(false);
+            const [editingPost, setEditingPost] = useState(null); 
+            const [jobCategories, setJobCategories] = useState([]); 
 
-            // States for FullPostModal
+            // MODIFICATION START: State for Auto-Approve setting in App component
+            const [isAutoApproveEnabled, setIsAutoApproveEnabled] = useState(false);
+            // MODIFICATION END
+
             const [showFullPostModal, setShowFullPostModal] = useState(false);
             const [selectedPost, setSelectedPost] = useState(null);
-
-            // Authentication modal states
-            const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup' mode for AuthForm
-
-            // Pagination states
-            const postsPerPage = 20; // Number of posts to display per page
+            const [authMode, setAuthMode] = useState('login'); 
+            const postsPerPage = 20; 
             const [currentPage, setCurrentPage] = useState(1);
-            // pageStartCursors stores the last document of each page to enable efficient pagination
-            const [pageStartCursors, setPageStartCursors] = useState([null]); // null for the first page
-            const [hasMore, setHasMore] = useState(false); // Indicates if there are more pages
-            const [pageJumpInput, setPageJumpInput] = useState(''); // Input for direct page jump
-            const [pageJumpError, setPageJumpError] = useState(null); // Error for page jump
-
-            // New states for search and filters
+            const [pageStartCursors, setPageStartCursors] = useState([null]); 
+            const [hasMore, setHasMore] = useState(false); 
+            const [pageJumpInput, setPageJumpInput] = useState(''); 
+            const [pageJumpError, setPageJumpError] = useState(null); 
             const [searchTerm, setSearchTerm] = useState('');
             const [filterDivision, setFilterDivision] = useState('');
             const [filterDistrict, setFilterDistrict] = useState('');
             const [filterJobCategory, setFilterJobCategory] = useState('');
-            const [filterPostType, setFilterPostType] = useState('all'); // 'all', 'job_receiver', 'job_sender'
-            const [showFilters, setShowFilters] = useState(false); // New state to control filter visibility
+            const [filterPostType, setFilterPostType] = useState('all'); 
+            const [showFilters, setShowFilters] = useState(false);
 
             // Initialize Firebase and set up authentication listener
             useEffect(() => {
                 const initFirebase = async () => {
                     try {
-                        // Use the globally available Firebase instances
                         const authInstance = window.authInstance;
                         const firestoreInstance = window.firestoreInstance;
 
@@ -1252,28 +1314,26 @@
                         // Listen for authentication state changes
                         window.onAuthStateChanged(authInstance, async (user) => {
                             if (user) {
-                                setUserId(user.uid); // Set userId if a user is logged in
-                                setShowAuthModal(false); // Close auth modal if user logs in
+                                setUserId(user.uid); 
+                                setShowAuthModal(false); 
 
-                                // Fetch user's full name and role from Firestore
                                 const userDocRef = window.doc(firestoreInstance, `artifacts/${window.canvasAppId}/users/${user.uid}/profile/details`);
                                 const userDocSnap = await window.getDoc(userDocRef);
                                 if (userDocSnap.exists()) {
                                     const userData = userDocSnap.data();
                                     setUserFullName(userData.fullName);
-                                    setUserRole(userData.role || 'user'); // Set role, default to 'user' if not defined
+                                    setUserRole(userData.role || 'user'); 
                                 } else {
-                                    // If user profile doesn't exist (e.g., old user or direct login without signup in this app)
-                                    setUserFullName(user.email); // Fallback to email
-                                    setUserRole('user'); // Default to user role
+                                    setUserFullName(user.email); 
+                                    setUserRole('user'); 
                                 }
 
                             } else {
-                                setUserId(null); // Clear userId if no user is logged in
-                                setUserFullName(null); // Clear full name
-                                setUserRole('user'); // Reset role to default
+                                setUserId(null); 
+                                setUserFullName(null); 
+                                setUserRole('user'); 
                             }
-                            setLoading(false); // Loading is complete once auth state is determined
+                            setLoading(false); 
                         });
 
                     } catch (e) {
@@ -1284,63 +1344,68 @@
                 };
 
                 initFirebase();
-            }, []); // Empty dependency array ensures this effect runs only once on mount
+            }, []); 
+
+            // MODIFICATION START: Fetch auto-approve settings globally in App
+            useEffect(() => {
+                if (!db) return;
+                
+                const settingsRef = window.doc(db, `artifacts/${window.canvasAppId}/public/settings`, 'autoApprove');
+                
+                const unsubscribe = window.onSnapshot(settingsRef, (docSnap) => {
+                    if (docSnap.exists() && docSnap.data().enabled) {
+                        setIsAutoApproveEnabled(true);
+                    } else {
+                        setIsAutoApproveEnabled(false);
+                    }
+                }, (e) => {
+                    console.error("Error fetching global settings:", e);
+                });
+
+                return () => unsubscribe();
+            }, [db]);
+            // MODIFICATION END
 
             // Fetch posts from Firestore with pagination and filters in real-time
             useEffect(() => {
-                // Only fetch if db is available (posts are visible to everyone)
                 if (!db) {
-                    setPosts([]); // Clear posts if db is not available
+                    setPosts([]); 
                     return;
                 }
 
-                // Reference to the 'posts' collection in Firestore
-                // Data is stored publicly under artifacts/{canvasAppId}/public/data/posts
                 const postsCollectionRef = window.collection(db, `artifacts/${window.canvasAppId}/public/data/posts`);
-
-                // Get the starting document for the current page from pageStartCursors
                 const startDoc = pageStartCursors[currentPage - 1];
-
-                // Base query: approved posts, ordered by timestamp
                 let q = window.query(
                     postsCollectionRef,
                     window.where('status', '==', 'approved'),
                     window.orderBy('timestamp', 'desc')
                 );
 
-                // Apply pagination limit and startAfter
                 if (startDoc) {
                     q = window.query(q, window.startAfter(startDoc), window.limit(postsPerPage + 1));
                 } else {
                     q = window.query(q, window.limit(postsPerPage + 1));
                 }
 
-                // Set up a real-time listener using onSnapshot
                 const unsubscribe = window.onSnapshot(q, (snapshot) => {
                     let fetchedPosts = snapshot.docs.map(doc => ({
                         id: doc.id,
                         ...doc.data()
                     }));
 
-                    // Apply client-side filters
                     let filteredClientSide = fetchedPosts.filter(post => {
-                        // Filter by postType
                         if (filterPostType !== 'all' && post.postType !== filterPostType) {
                             return false;
                         }
-                        // Filter by division
                         if (filterDivision && post.division !== filterDivision) {
                             return false;
                         }
-                        // Filter by district
                         if (filterDistrict && post.district !== filterDistrict) {
                             return false;
                         }
-                        // Filter by jobCategory
                         if (filterJobCategory && post.jobCategory !== filterJobCategory) {
                             return false;
                         }
-                        // Filter by search term (title or description/bioSummary)
                         if (searchTerm) {
                             const lowerCaseSearchTerm = searchTerm.toLowerCase();
                             const title = post.postType === 'job_sender' ? post.jobTitle : post.desiredJobTitle;
@@ -1352,17 +1417,10 @@
                         }
                         return true;
                     });
-
-                    // Update hasMore based on the original fetchedPosts length (before client-side filtering)
-                    // This is important because hasMore should reflect if there are more *database* pages,
-                    // not just more client-side filtered items.
+                    
                     setHasMore(fetchedPosts.length > postsPerPage);
+                    setPosts(filteredClientSide.slice(0, postsPerPage));
 
-                    // Set the posts to the client-side filtered results
-                    setPosts(filteredClientSide.slice(0, postsPerPage)); // Still show only `postsPerPage` after client-side filtering
-
-                    // If there are more posts from the database and we haven't stored the cursor for the next page yet,
-                    // store the last document of the original fetched batch as the start cursor for the next page.
                     if (fetchedPosts.length > postsPerPage && pageStartCursors.length <= currentPage) {
                         const nextStartDoc = snapshot.docs[postsPerPage - 1];
                         setPageStartCursors(prev => {
@@ -1376,9 +1434,8 @@
                     setError("পোস্টের তালিকা লোড করতে সমস্যা হয়েছে।");
                 });
 
-                // Clean up the listener when the component unmounts or dependencies change
                 return () => unsubscribe();
-            }, [db, currentPage, pageStartCursors.length, filterDivision, filterDistrict, filterJobCategory, filterPostType, searchTerm]); // Added filter dependencies
+            }, [db, currentPage, pageStartCursors.length, filterDivision, filterDistrict, filterJobCategory, filterPostType, searchTerm]); 
 
             // Reset pagination when filters change
             useEffect(() => {
@@ -1411,29 +1468,32 @@
 
             /**
              * Function to add a new post (job or job seeker profile) to Firestore.
-             * Uses serverTimestamp for accurate server-side timestamping.
              */
             const addJob = async (postData) => {
-                if (!db || !userId || !userFullName) { // Ensure user and their name are available
+                if (!db || !userId || !userFullName) { 
                     setError("পোস্ট করার জন্য লগইন করুন এবং আপনার নাম উপলব্ধ আছে কিনা নিশ্চিত করুন।");
                     return;
                 }
                 try {
+                    // MODIFICATION START: Set status based on auto-approve setting
+                    const status = isAutoApproveEnabled ? 'approved' : 'pending';
+                    // MODIFICATION END
+
                     await window.addDoc(window.collection(db, `artifacts/${window.canvasAppId}/public/data/posts`), {
                         ...postData,
                         postedBy: userId,
-                        userName: userFullName, // Store the full name with the post
-                        timestamp: window.serverTimestamp(), // Use serverTimestamp for accurate time
-                        status: 'pending' // New posts are always pending by default
+                        userName: userFullName, 
+                        timestamp: window.serverTimestamp(), 
+                        status: status // Use the determined status
                     });
                     console.log("Post added successfully!");
-                    setShowPostForm(false); // Close the form after successful submission
-                    setCurrentPage(1); // Go back to the first page to see the new post
-                    setPageStartCursors([null]); // Reset pagination cursors
+                    setShowPostForm(false);
+                    setCurrentPage(1); 
+                    setPageStartCursors([null]); 
                 } catch (e) {
                     console.error("Error adding post:", e);
                     setError("পোস্ট করতে সমস্যা হয়েছে।");
-                    throw e; // Re-throw to allow PostJobForm to catch and display specific error
+                    throw e; 
                 }
             };
 
@@ -1447,17 +1507,16 @@
                 }
                 try {
                     const postRef = window.doc(db, `artifacts/${window.canvasAppId}/public/data/posts`, postId);
-                    // Ensure only the owner can update (client-side check, security rules also needed)
                     const postSnap = await window.getDoc(postRef);
                     if (postSnap.exists() && postSnap.data().postedBy === userId) {
                         await window.updateDoc(postRef, {
                             ...updatedData,
-                            timestamp: window.serverTimestamp(), // Update timestamp on edit
-                            status: 'pending' // Set status to pending after edit
+                            timestamp: window.serverTimestamp(), 
+                            status: 'pending' // Edited post always goes to pending
                         });
                         console.log("Post updated successfully!");
-                        setEditingPost(null); // Clear editing state
-                        setShowPostForm(false); // Close the form
+                        setEditingPost(null); 
+                        setShowPostForm(false); 
                     } else {
                         setError("আপনি এই পোস্টটি সম্পাদনা করার অনুমতিপ্রাপ্ত নন।");
                     }
@@ -1480,7 +1539,6 @@
                     const postRef = window.doc(db, `artifacts/${window.canvasAppId}/public/data/posts`, postId);
                     const postSnap = await window.getDoc(postRef);
 
-                    // Check if the user is an admin OR the owner of the post
                     if (userRole === 'admin' || (postSnap.exists() && postSnap.data().postedBy === userId)) {
                         await window.deleteDoc(postRef);
                         console.log("Post deleted successfully!");
@@ -1500,16 +1558,16 @@
                 if (auth) {
                     try {
                         await window.signOut(auth);
-                        setUserId(null); // Clear userId on logout
-                        setUserFullName(null); // Clear full name on logout
-                        setUserRole('user'); // Reset role
-                        setPosts([]); // Clear posts on logout (optional, can be kept if desired)
-                        setCurrentPage(1); // Reset pagination
+                        setUserId(null); 
+                        setUserFullName(null);
+                        setUserRole('user');
+                        setPosts([]);
+                        setCurrentPage(1); 
                         setPageStartCursors([null]);
-                        setShowProfileModal(false); // Close profile modal on logout
-                        setShowAdminPanel(false); // Close admin panel on logout
-                        setEditingPost(null); // Clear any editing state
-                        setAuthMode('login'); // Default to login mode
+                        setShowProfileModal(false); 
+                        setShowAdminPanel(false); 
+                        setEditingPost(null);
+                        setAuthMode('login'); 
                         console.log("Logged out successfully!");
                     } catch (e) {
                         console.error("Error logging out:", e);
@@ -1523,11 +1581,9 @@
                 setUserId(user.uid);
                 setShowAuthModal(false);
 
-                // If it's a new signup with a name, store it in Firestore
                 if (name) {
                     try {
                         const userDocRef = window.doc(db, `artifacts/${window.canvasAppId}/users/${user.uid}/profile/details`);
-                        // Set role to 'user' for new signups by default
                         await window.setDoc(userDocRef, { fullName: name, email: user.email, role: 'user' }, { merge: true });
                         setUserFullName(name);
                         setUserRole('user');
@@ -1537,41 +1593,37 @@
                         setError("ব্যবহারকারীর প্রোফাইল সংরক্ষণ করতে সমস্যা হয়েছে।");
                     }
                 } else {
-                    // For login, fetch the name and role if they exist
                     try {
                         const userDocRef = window.doc(db, `artifacts/${window.canvasAppId}/users/${user.uid}/profile/details`);
                         const userDocSnap = await window.getDoc(userDocRef);
                         if (userDocSnap.exists()) {
                             const userData = userDocSnap.data();
                             setUserFullName(userData.fullName);
-                            setUserRole(userData.role || 'user'); // Fallback to 'user'
+                            setUserRole(userData.role || 'user'); 
                         } else {
-                            setUserFullName(user.email); // Fallback to email
-                            setUserRole('user'); // Default to user role
+                            setUserFullName(user.email); 
+                            setUserRole('user'); 
                         }
                     } catch (e) {
                         console.error("Error fetching user profile on login:", e);
-                        setUserFullName(user.email); // Fallback to email on error
-                        setUserRole('user'); // Default to user role on error
+                        setUserFullName(user.email); 
+                        setUserRole('user'); 
                     }
                 }
             };
 
-            // Function to handle editing a post from the profile modal
             const handleEditPostClick = (post) => {
                 setEditingPost(post);
-                setShowPostForm(true); // Open the post form in edit mode
-                setShowProfileModal(false); // Close the profile modal
+                setShowPostForm(true); 
+                setShowProfileModal(false);
             };
 
-            // Function to handle opening the full post modal
             const handlePostClick = (post) => {
                 setSelectedPost(post);
                 setShowFullPostModal(true);
             };
 
 
-            // Pagination navigation functions
             const goToNextPage = () => {
                 if (hasMore) {
                     setCurrentPage(prev => prev + 1);
@@ -1586,21 +1638,17 @@
 
             const goToFirstPage = () => {
                 setCurrentPage(1);
-                setPageStartCursors([null]); // Reset cursors to start from the beginning
+                setPageStartCursors([null]); 
             };
 
-            // Handles direct page jumps
             const handlePageJump = () => {
                 const targetPage = parseInt(pageJumpInput, 10);
                 if (isNaN(targetPage) || targetPage < 1) {
                     setPageJumpError("অনুগ্রহ করে একটি বৈধ পৃষ্ঠা নম্বর লিখুন।");
                     return;
                 }
-                setPageJumpError(null); // Clear previous page jump errors
+                setPageJumpError(null); 
 
-                // Firestore pagination with startAfter works sequentially.
-                // We can only jump to a page if we have already visited it (and thus stored its start cursor)
-                // or if it's the first page.
                 if (targetPage === 1 || (targetPage - 1 < pageStartCursors.length && pageStartCursors[targetPage - 1])) {
                     setCurrentPage(targetPage);
                 } else {
@@ -1608,11 +1656,9 @@
                 }
             };
 
-            // Get districts based on the selected filter division
             const districtsForFilterDivision = filterDivision ? DIVISIONS_DATA[filterDivision] : [];
 
 
-            // Display loading state
             if (loading) {
                 return (
                     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -1631,14 +1677,12 @@
                         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
                             <h1 className="text-3xl font-extrabold mb-2 sm:mb-0">শ্রমিক বাজার</h1>
                             <div className="flex items-center space-x-4">
-                                {/* Admin Panel Icon (visible only to admin user) */}
-                                {userRole === 'admin' && ( // Check userRole instead of hardcoded ID
+                                {userRole === 'admin' && ( 
                                     <button
                                         onClick={() => setShowAdminPanel(true)}
                                         className="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full p-1 transition duration-150 ease-in-out"
                                         title="অ্যাডমিন প্যানেল"
                                     >
-                                        {/* Simple gear icon for admin panel */}
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37.996.608 2.296.307 2.572-1.065z"></path>
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -1648,10 +1692,9 @@
 
                                 {userId ? (
                                     <>
-                                        {/* Post Button in Header */}
                                         <button
                                             onClick={() => {
-                                                setEditingPost(null); // Ensure no post is being edited when opening for new post
+                                                setEditingPost(null); 
                                                 setShowPostForm(true);
                                             }}
                                             className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-300 text-sm"
@@ -1659,7 +1702,6 @@
                                             পোস্ট করুন
                                         </button>
 
-                                        {/* User Profile Icon */}
                                         <button
                                             onClick={() => setShowProfileModal(true)}
                                             className="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full p-1 transition duration-150 ease-in-out"
@@ -1671,7 +1713,6 @@
                                             <span className="sr-only">আমার প্রোফাইল</span>
                                         </button>
 
-                                        {/* Logout Icon */}
                                         <button
                                             onClick={handleLogout}
                                             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center"
@@ -1680,12 +1721,11 @@
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                                             </svg>
-                                            <span className="sr-only">লগআউট</span> {/* Screen reader text */}
+                                            <span className="sr-only">লগআউট</span>
                                         </button>
                                     </>
                                 ) : (
                                     <>
-                                        {/* Separate Login and Signup buttons */}
                                         <button
                                             onClick={() => { setShowAuthModal(true); setAuthMode('login'); }}
                                             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
@@ -1706,7 +1746,6 @@
 
                     {/* Main Content Area */}
                     <main className="container mx-auto p-4 mt-8">
-                        {/* Error Display */}
                         {error && (
                             <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 shadow-sm">
                                 <p className="font-semibold">ত্রুটি:</p>
@@ -1718,7 +1757,6 @@
                         <section className="bg-white rounded-xl shadow-lg p-6 mb-8">
                             <h2 className="text-2xl font-bold text-gray-800 mb-4">পোস্ট খুঁজুন</h2>
                             <div className="flex items-center gap-2 mb-4">
-                                {/* Search Input with Icon */}
                                 <div className="relative flex-grow">
                                     <input
                                         type="text"
@@ -1735,7 +1773,6 @@
                                     </div>
                                 </div>
 
-                                {/* Filter Icon Button */}
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
@@ -1747,10 +1784,8 @@
                                 </button>
                             </div>
 
-                            {/* Filter Options (Conditional Rendering) */}
                             {showFilters && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 transition-all duration-300 ease-in-out">
-                                    {/* Post Type Filter */}
                                     <div>
                                         <label htmlFor="filterPostType" className="block text-sm font-medium text-gray-700 mb-1">পোস্টের ধরণ</label>
                                         <select
@@ -1765,7 +1800,6 @@
                                         </select>
                                     </div>
 
-                                    {/* Division Filter */}
                                     <div>
                                         <label htmlFor="filterDivision" className="block text-sm font-medium text-gray-700 mb-1">বিভাগ</label>
                                         <select
@@ -1773,7 +1807,7 @@
                                             value={filterDivision}
                                             onChange={(e) => {
                                                 setFilterDivision(e.target.value);
-                                                setFilterDistrict(''); // Reset district when division changes
+                                                setFilterDistrict(''); 
                                             }}
                                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                         >
@@ -1784,7 +1818,6 @@
                                         </select>
                                     </div>
 
-                                    {/* District Filter */}
                                     <div>
                                         <label htmlFor="filterDistrict" className="block text-sm font-medium text-gray-700 mb-1">জেলা</label>
                                         <select
@@ -1792,7 +1825,7 @@
                                             value={filterDistrict}
                                             onChange={(e) => setFilterDistrict(e.target.value)}
                                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                            disabled={!filterDivision} // Disable until division is selected
+                                            disabled={!filterDivision}
                                         >
                                             <option value="">সকল জেলা</option>
                                             {districtsForFilterDivision.map((district) => (
@@ -1801,7 +1834,6 @@
                                         </select>
                                     </div>
 
-                                    {/* Job Category Filter */}
                                     <div>
                                         <label htmlFor="filterJobCategory" className="block text-sm font-medium text-gray-700 mb-1">কাজের ধরণ</label>
                                         <select
@@ -1828,28 +1860,25 @@
                                         key={post.id}
                                         className={`rounded-xl shadow-lg p-6 border transition-shadow duration-300 cursor-pointer 
                                             ${post.postType === 'job_sender' ? 'bg-blue-50 border-blue-200 hover:shadow-blue-200' : 'bg-purple-50 border-purple-200 hover:shadow-purple-200'}`}
-                                        onClick={() => handlePostClick(post)} // Make the entire card clickable
+                                        onClick={() => handlePostClick(post)}
                                     >
                                         {post.postType === 'job_sender' ? (
                                             <>
                                                 <h3 className="text-xl font-bold text-blue-700 mb-2">{post.jobTitle}</h3>
-                                                {/* Display Number of Workers Needed */}
                                                 <p className="text-gray-600 mb-1"><strong>শ্রমিক লাগবে:</strong> {post.numWorkersNeeded} জন</p>
-                                                {/* Removed Division from here */}
                                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                                 <p className="text-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
-                                                <p className="text-gray-700 mb-3 truncate-1-line">{post.description}</p> {/* Truncate here */}
+                                                <p className="text-gray-700 mb-3 truncate-1-line">{post.description}</p>
                                                 {post.salary && <p className="text-green-600 font-semibold">বেতন: {post.salary} টাকা</p>}
                                             </>
                                         ) : (
                                             <>
                                                 <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
-                                                {/* Display Number of Team Members */}
                                                 <p className="text-gray-600 mb-1"><strong>কর্মী আছে:</strong> {post.numTeamMembers} জন</p>
                                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
                                                 {post.expectedSalary && <p className="text-green-600 font-semibold">প্রত্যাশিত বেতন: {post.expectedSalary} টাকা</p>}
-                                                <p className="text-gray-700 mt-3 truncate-1-line">{post.bioSummary}</p> {/* Truncate here */}
+                                                <p className="text-gray-700 mt-3 truncate-1-line">{post.bioSummary}</p>
                                             </>
                                         )}
                                         <p className="text-xs text-gray-500 mt-3">পোস্ট করেছেন: {post.userName || post.postedBy}</p>
@@ -1868,9 +1897,7 @@
                         </section>
 
                         {/* Pagination Controls */}
-                        {/* Pagination controls are now visible to everyone */}
                         <div className="flex flex-col items-center mt-8 space-y-4">
-                            {/* Previous, Current Page, Next on one line */}
                             <div className="flex flex-wrap justify-center items-center gap-4">
                                 <button
                                     onClick={goToPreviousPage}
@@ -1891,8 +1918,7 @@
                                 </button>
                             </div>
 
-                            {/* First Page, Page #, Go on the second line - now smaller and more compact */}
-                            <div className="flex flex-wrap justify-center items-center gap-2 mt-2"> {/* Reduced gap and margin-top */}
+                            <div className="flex flex-wrap justify-center items-center gap-2 mt-2">
                                 <button
                                     onClick={goToFirstPage}
                                     disabled={currentPage === 1}
@@ -1900,17 +1926,17 @@
                                 >
                                     প্রথম পৃষ্ঠা
                                 </button>
-                                <div className="flex items-center space-x-1"> {/* Reduced space-x */}
+                                <div className="flex items-center space-x-1">
                                     <input
                                         type="number"
                                         value={pageJumpInput}
                                         onChange={(e) => setPageJumpInput(e.target.value)}
                                         placeholder="পৃষ্ঠা #"
-                                        className="w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-xs" /* Reduced width, padding, and font size */
+                                        className="w-20 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-xs"
                                     />
                                     <button
                                         onClick={handlePageJump}
-                                        className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-md shadow-sm text-xs transition duration-300 ease-in-out" /* Reduced padding and font size */
+                                        className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-md shadow-sm text-xs transition duration-300 ease-in-out"
                                     >
                                         যাও
                                     </button>
@@ -1922,7 +1948,7 @@
                         </div>
                     </main>
 
-                    {/* Auth Modal */}
+                    {/* Modals */}
                     {showAuthModal && (
                         <AuthForm
                             mode={authMode}
@@ -1933,7 +1959,6 @@
                         />
                     )}
 
-                    {/* Post Job Form Modal */}
                     {showPostForm && (
                         <PostJobForm
                             onClose={() => {
@@ -1947,7 +1972,6 @@
                         />
                     )}
 
-                    {/* User Profile Modal */}
                     {showProfileModal && (
                         <UserProfileModal
                             onClose={() => setShowProfileModal(false)}
@@ -1959,7 +1983,6 @@
                         />
                     )}
 
-                    {/* Admin Panel Modal */}
                     {showAdminPanel && (
                         <AdminPanelModal
                             onClose={() => setShowAdminPanel(false)}
@@ -1969,7 +1992,6 @@
                         />
                     )}
 
-                    {/* Full Post Details Modal */}
                     {showFullPostModal && (
                         <FullPostModal
                             post={selectedPost}
@@ -1977,7 +1999,7 @@
                                 setShowFullPostModal(false);
                                 setSelectedPost(null);
                             }}
-                            isLoggedIn={!!userId} // Pass login status to FullPostModal
+                            isLoggedIn={!!userId}
                         />
                     )}
                 </div>
