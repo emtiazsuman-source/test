@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -752,7 +751,7 @@
                                             {post.postType === 'job_sender' ? (
                                                 <>
                                                     <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা9: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                     {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -762,7 +761,7 @@
                                             ) : (
                                                 <>
                                                     <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা10: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                     {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1131,7 +1130,7 @@
                                                     {post.postType === 'job_sender' ? (
                                                         <>
                                                             <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                            <p className="text-sm text-gray-600">শ্রমিক সংখ্যা1: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                                            <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                                             <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                             <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                             {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1141,7 +1140,7 @@
                                                     ) : (
                                                         <>
                                                             <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                            <p className="text-sm text-gray-600">შ্রমিক সংখ্যা2: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                                            <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                                             <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                             <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                             {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1190,7 +1189,22 @@
             };
 
             const handleShowNumberClick = () => {
-                // This is where you would integrate the rewarded video ad logic
+                // For Android Studio WebView integration:
+                // This is where you would call the JavaScript Interface from your native Android app.
+                // For example:
+                // if (window.Android && typeof window.Android.showRewardAd === 'function') {
+                //     window.Android.showRewardAd();
+                //     // After the ad is successfully watched, the Android app should call a
+                //     // JavaScript function back in the WebView to set the state, for example:
+                //     // webView.evaluateJavascript("revealMobileNumber()", null);
+                //     // And you would have a global function:
+                //     // window.revealMobileNumber = () => setShowFullNumber(true);
+                // } else {
+                //     // Fallback for web or if the interface isn't available
+                //     setShowFullNumber(true);
+                // }
+
+                // For now, we will directly show the number on click.
                 setShowFullNumber(true);
             };
 
@@ -1198,9 +1212,7 @@
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50 overflow-y-auto">
                     <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-xl transform transition-all duration-300 scale-100 opacity-100 my-8">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800">
-                                {post.postType === 'job_sender' ? 'মালিকের পোস্টের বিস্তারিত' : 'শ্রমিকের প্রোফাইল বিস্তারিত'}
-                            </h2>
+                            <h2 className="text-2xl font-bold text-gray-800">পোস্টের বিস্তারিত</h2>
                             <button
                                 onClick={onClose}
                                 className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full p-1 transition duration-150 ease-in-out"
@@ -1215,7 +1227,7 @@
                         {post.postType === 'job_sender' ? (
                             <>
                                 <h3 className="text-xl font-bold text-blue-700 mb-2">{post.jobTitle}</h3>
-                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা3:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                 <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
@@ -1249,7 +1261,7 @@
                         ) : (
                             <>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
-                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা4:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                 <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
