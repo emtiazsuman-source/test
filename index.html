@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -751,7 +752,7 @@
                                             {post.postType === 'job_sender' ? (
                                                 <>
                                                     <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                                    <p className="text-sm text-gray-600">শ্রমিক প্রয়োজন: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                     {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -761,7 +762,7 @@
                                             ) : (
                                                 <>
                                                     <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                    <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                                    <p className="text-sm text-gray-600">শ্রমিক আছে: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                                     <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                     <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                     {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1130,7 +1131,7 @@
                                                     {post.postType === 'job_sender' ? (
                                                         <>
                                                             <h4 className="text-lg font-semibold text-blue-600">{post.jobTitle}</h4>
-                                                            <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                                            <p className="text-sm text-gray-600">শ্রমিক প্রয়োজন: {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                                             <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                             <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                             {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1140,7 +1141,7 @@
                                                     ) : (
                                                         <>
                                                             <h4 className="text-lg font-semibold text-purple-600">{post.desiredJobTitle}</h4>
-                                                            <p className="text-sm text-gray-600">শ্রমিক সংখ্যা: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                                            <p className="text-sm text-gray-600">শ্রমিক আছে: {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                                             <p className="text-sm text-gray-600">বিভাগ: {post.division}, জেলা: {post.district}</p>
                                                             <p className="text-sm text-gray-600">কাজের ধরণ: {post.jobCategory}</p>
                                                             {post.mobileNumber && <p className="text-sm text-gray-600">মোবাইল নম্বর: {post.mobileNumber}</p>}
@@ -1227,7 +1228,7 @@
                         {post.postType === 'job_sender' ? (
                             <>
                                 <h3 className="text-xl font-bold text-blue-700 mb-2">{post.jobTitle}</h3>
-                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                <p className="text-gray-600 mb-1"><strong>শ্রমিক প্রয়োজন:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                 <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
@@ -1261,7 +1262,7 @@
                         ) : (
                             <>
                                 <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
-                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                <p className="text-gray-600 mb-1"><strong>শ্রমিক আছে:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                 <p className="text-gray-600 mb-1"><strong>বিভাগ:</strong> {post.division}</p>
                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
@@ -1887,7 +1888,7 @@
                                         {post.postType === 'job_sender' ? (
                                             <>
                                                 <h3 className="text-xl font-bold text-blue-700 mb-2">{post.jobTitle}</h3>
-                                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
+                                                <p className="text-gray-600 mb-1"><strong>শ্রমিক প্রয়োজন:</strong> {convertToBengaliNumerals(post.numWorkersNeeded)} জন</p>
                                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                                 <p className="text-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
                                                 <p className="text-gray-700 mb-3 truncate-1-line">{post.description}</p>
@@ -1896,7 +1897,7 @@
                                         ) : (
                                             <>
                                                 <h3 className="text-xl font-bold text-purple-700 mb-2">{post.desiredJobTitle}</h3>
-                                                <p className="text-gray-600 mb-1"><strong>শ্রমিক সংখ্যা:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
+                                                <p className="text-gray-600 mb-1"><strong>শ্রমিক আছে:</strong> {convertToBengaliNumerals(post.numTeamMembers)} জন</p>
                                                 <p className="text-gray-600 mb-1"><strong>জেলা:</strong> {post.district}</p>
                                                 <p className="text-gray-600 mb-1"><strong>কাজের ধরণ:</strong> {post.jobCategory}</p>
                                                 {post.expectedSalary && <p className="text-green-600 font-semibold">বেতন: {convertToBengaliNumerals(post.expectedSalary)} টাকা</p>}
