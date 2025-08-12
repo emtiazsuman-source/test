@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -815,6 +816,12 @@
             const [newCategoryName, setNewCategoryName] = useState('');
             const [categoryManagementError, setCategoryManagementError] = useState(null);
             const [isAddingCategory, setIsAddingCategory] = useState(false);
+            
+            // New state for App Links management
+            const [appLinks, setAppLinks] = useState({ googlePlayUrl: '', appleAppStoreUrl: '' });
+            const [loadingAppLinks, setLoadingAppLinks] = useState(true);
+            const [appLinksError, setAppLinksError] = useState(null);
+            const [isUpdatingAppLinks, setIsUpdatingAppLinks] = useState(false);
 
             const [activeTab, setActiveTab] = useState('posts');
 
@@ -848,6 +855,27 @@
                 };
                 getSettings();
             }, [db, isAdmin]);
+            
+            // Fetch app links for admin management
+            useEffect(() => {
+                if (!db || !isAdmin) {
+                    setLoadingAppLinks(false);
+                    return;
+                }
+                const appLinksRef = window.doc(db, `artifacts/${window.canvasAppId}/public/data/settings/appLinks`);
+                const unsubscribe = window.onSnapshot(appLinksRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        setAppLinks(docSnap.data());
+                    }
+                    setLoadingAppLinks(false);
+                }, (e) => {
+                    console.error("Error fetching app links:", e);
+                    setAppLinksError("অ্যাপ লিঙ্ক লোড করতে সমস্যা হয়েছে।");
+                    setLoadingAppLinks(false);
+                });
+
+                return () => unsubscribe();
+            }, [db, isAdmin]);
 
             // Function to toggle the auto-approve switch
             const handleToggleAutoApprove = async () => {
@@ -862,6 +890,27 @@
                     console.error("Error updating admin settings:", e);
                     setSettingsError("সেটিংস আপডেট করতে সমস্যা হয়েছে।");
                     setAutoApprove(!newStatus); // Rollback UI on error
+                }
+            };
+            
+            // Function to update app links
+            const handleUpdateAppLinks = async (e) => {
+                e.preventDefault();
+                if (!db || !isAdmin) {
+                    setAppLinksError("আপনার এই কাজটি করার অনুমতি নেই।");
+                    return;
+                }
+                setIsUpdatingAppLinks(true);
+                setAppLinksError(null);
+                try {
+                    const appLinksRef = window.doc(db, `artifacts/${window.canvasAppId}/public/data/settings/appLinks`);
+                    await window.setDoc(appLinksRef, appLinks, { merge: true });
+                    alert("অ্যাপ লিঙ্ক সফলভাবে আপডেট করা হয়েছে!");
+                } catch (err) {
+                    console.error("Error updating app links:", err);
+                    setAppLinksError("অ্যাপ লিঙ্ক আপডেট করতে সমস্যা হয়েছে: " + err.message);
+                } finally {
+                    setIsUpdatingAppLinks(false);
                 }
             };
 
@@ -1060,12 +1109,66 @@
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                                 >
-                                    কাজের ধরণ ব্যবস্থাপনা
+                                    কাজের ধরণ
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('app_links')}
+                                    className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-base ${
+                                        activeTab === 'app_links'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    অ্যাপ লিঙ্ক
                                 </button>
                             </nav>
                         </div>
 
                         <div className="overflow-y-auto max-h-[calc(90vh-320px)]"> 
+                            {activeTab === 'app_links' && (
+                                <div className="p-2">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4">অ্যাপ স্টোর লিঙ্ক ম্যানেজ করুন</h3>
+                                    {appLinksError && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm">{appLinksError}</div>}
+                                    {loadingAppLinks ? (
+                                        <p>লিঙ্ক লোড হচ্ছে...</p>
+                                    ) : (
+                                        <form onSubmit={handleUpdateAppLinks} className="space-y-4">
+                                            <div>
+                                                <label htmlFor="googlePlayUrl" className="block text-sm font-medium text-gray-700 mb-1">গুগল প্লে স্টোর লিঙ্ক</label>
+                                                <input
+                                                    type="url"
+                                                    id="googlePlayUrl"
+                                                    value={appLinks.googlePlayUrl}
+                                                    onChange={(e) => setAppLinks(prev => ({ ...prev, googlePlayUrl: e.target.value }))}
+                                                    placeholder="https://play.google.com/store/apps/details?id=..."
+                                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="appleAppStoreUrl" className="block text-sm font-medium text-gray-700 mb-1">অ্যাপল অ্যাপ স্টোর লিঙ্ক</label>
+                                                <input
+                                                    type="url"
+                                                    id="appleAppStoreUrl"
+                                                    value={appLinks.appleAppStoreUrl}
+                                                    onChange={(e) => setAppLinks(prev => ({ ...prev, appleAppStoreUrl: e.target.value }))}
+                                                    placeholder="https://apps.apple.com/app/..."
+                                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end">
+                                                <button
+                                                    type="submit"
+                                                    disabled={isUpdatingAppLinks}
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md shadow-sm transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    {isUpdatingAppLinks ? 'আপডেট হচ্ছে...' : 'লিঙ্ক আপডেট করুন'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    )}
+                                </div>
+                            )}
+
                             {activeTab === 'categories' && (
                                 <div className="p-2">
                                     {categoryManagementError && (
@@ -1325,6 +1428,9 @@
             const [editingPost, setEditingPost] = useState(null);
             const [jobCategories, setJobCategories] = useState([]);
             
+            // New state for app store links
+            const [appStoreLinks, setAppStoreLinks] = useState({ googlePlayUrl: '', appleAppStoreUrl: '' });
+            
             // State to hold the global auto-approve setting
             const [autoApproveEnabled, setAutoApproveEnabled] = useState(false);
 
@@ -1390,6 +1496,21 @@
 
                 initFirebase();
             }, []);
+            
+            // Fetch App Links from Firestore
+            useEffect(() => {
+                if (!db) return;
+                const appLinksRef = window.doc(db, `artifacts/${window.canvasAppId}/public/data/settings/appLinks`);
+                const unsubscribe = window.onSnapshot(appLinksRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        setAppStoreLinks(docSnap.data());
+                    }
+                }, (err) => {
+                    console.error("Error fetching app links for footer:", err);
+                });
+
+                return () => unsubscribe();
+            }, [db]);
 
             // Listen for changes in the global admin settings for auto-approval
             useEffect(() => {
@@ -1943,6 +2064,22 @@
                                 <a href="contact.html" className="text-gray-300 hover:text-white transition-colors duration-200">যোগাযোগ</a>
                                 <a href="privacy-policy.html" className="text-gray-300 hover:text-white transition-colors duration-200">গোপনীয়তা নীতি</a>
                             </div>
+
+                            {(appStoreLinks.googlePlayUrl || appStoreLinks.appleAppStoreUrl) && (
+                                <div className="flex justify-center items-center space-x-4 my-6">
+                                    {appStoreLinks.googlePlayUrl && (
+                                        <a href={appStoreLinks.googlePlayUrl} target="_blank" rel="noopener noreferrer">
+                                            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/bn_badge_web_generic.png" alt="Get it on Google Play" className="h-12"/>
+                                        </a>
+                                    )}
+                                    {appStoreLinks.appleAppStoreUrl && (
+                                        <a href={appStoreLinks.appleAppStoreUrl} target="_blank" rel="noopener noreferrer">
+                                            <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1276560000" alt="Download on the App Store" className="h-12"/>
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+
                             <p className="text-sm text-gray-400">&copy; {convertToBengaliNumerals(new Date().getFullYear())} শ্রমিক বাজার। সর্বস্বত্ব সংরক্ষিত।</p>
                         </div>
                     </footer>
@@ -2002,4 +2139,3 @@
     </script>
 </body>
 </html>
-```
