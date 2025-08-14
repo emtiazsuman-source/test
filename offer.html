@@ -52,4 +52,48 @@
 
           <div class="cta-row">
             <!-- এখানে আপনার CPA লিঙ্ক -->
-            <a id="cta" class="cta" href="https://singingfiles.com/show.php?l=0&u=1141390&id=70892" rel="nofollo
+            <a id="cta" class="cta" href="https://singingfiles.com/show.php?l=0&u=1141390&id=70892" rel="nofollow noopener sponsored">Claim Free Trial →</a>
+            <div class="secure">🔒 256-bit SSL • PCI compliant • No hidden fees</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card p-24 order">
+        <h2>Order summary</h2>
+        <div class="row"><div class="left">Boxer shorts <span class="uk-badge">FREE trial</span></div><div class="price free">£0.00</div></div>
+        <div class="row"><div class="left">Shipped to your UK address</div><div class="price green">£0.00</div></div>
+        <div class="row"><div class="left">VAT (included)</div><div class="price">£0.00</div></div>
+        <div class="row"><div class="left"><strong>Order total</strong></div><div class="price free"><strong>£0.00</strong></div></div>
+        <p class="disclaimer">This page may contain affiliate/CPA links...</p>
+      </aside>
+    </div>
+
+    <footer>
+      <div>© <span id="year"></span> On That Offer</div>
+      <div><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Cookie Policy</a></div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Timer
+    const T_KEY = 'uk_offer_deadline_v1';
+    const now = Date.now();
+    let deadline = sessionStorage.getItem(T_KEY);
+    if(!deadline){ deadline = now + 10*60*1000; sessionStorage.setItem(T_KEY, deadline); }
+    deadline = parseInt(deadline,10);
+    const tMin = document.getElementById('t-min');
+    const tSec = document.getElementById('t-sec');
+    function tick(){
+      const ms = Math.max(0, deadline - Date.now());
+      const s = Math.floor(ms / 1000);
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      tMin.textContent = String(m).padStart(2,'0');
+      tSec.textContent = String(r).padStart(2,'0');
+    }
+    tick();
+    setInterval(tick, 500);
+  </script>
+</body>
+</html>
