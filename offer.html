@@ -8,65 +8,13 @@
   <meta property="og:title" content="Limited UK Offer — Free Boxer Shorts" />
   <meta property="og:description" content="Fast shipping across the UK. Limited stock. Claim yours now." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://placehold.co/1200x630/png" />
+  <!-- এখানে আপনার ফটো লিঙ্ক -->
+  <meta property="og:image" content="YOUR_IMAGE_URL_HERE" /> 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f1115; --card:#151821; --muted:#a8b0c2; --text:#e8ecf7; --accent:#26d07c; --accent-2:#ffc83d; --danger:#ff5d5d;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#0b0d12 0%,#121523 60%,#0b0d12 100%);color:var(--text)}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
-    .brand{display:flex;align-items:center;gap:10px}
-    .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1f8efa, #26d07c)}
-    .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
-    .uk-badge{font-size:12px;background:#1b2030;border:1px solid #2b3246;padding:6px 10px;border-radius:999px;color:#c9d1e8}
-
-    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
-    @media (max-width:900px){.grid{grid-template-columns:1fr}}
-
-    .card{background:var(--card);border:1px solid #242a3b;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .p-24{padding:24px}
-    .headline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-    .headline .offer{background:linear-gradient(90deg,#ff7d4d,#ffc83d);color:#231800;font-weight:800;font-size:13px;padding:8px 12px;border-radius:999px}
-    .timer{display:flex;align-items:center;gap:8px;font-weight:700}
-    .timer .pill{min-width:46px;text-align:center;background:#1b2030;border:1px solid #2b3246;border-radius:10px;padding:8px 6px}
-
-    .hero{display:grid;grid-template-columns:1fr;gap:16px}
-    .product{
-      position:relative;border-radius:14px;overflow:hidden;background:#0e1119;border:1px solid #23293a
-    }
-    .product img{width:100%;display:block}
-    .free-badge{position:absolute;left:12px;top:12px;background:var(--accent);color:#082d1c;font-weight:800;padding:8px 12px;border-radius:10px}
-
-    .benefits{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
-    .benefit{display:flex;gap:10px;align-items:flex-start}
-    .tick{width:22px;height:22px;border-radius:6px;background:#133b2b;border:1px solid #1e5b42;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
-
-    .cta-row{display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap}
-    .cta{flex:1 1 260px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 18px;border-radius:12px;border:none;background:var(--accent);color:#032514;font-weight:800;font-size:16px;cursor:pointer;transition:filter .15s ease}
-    .cta:hover{filter:brightness(1.05)}
-    .secure{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-
-    .order{display:grid;gap:14px}
-    .row{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:12px;background:#101422;border:1px solid #22283a}
-    .row .left{display:flex;align-items:center;gap:12px}
-    .price{font-weight:800}
-    .green{color:var(--accent)}
-    .free{color:#1fe38b}
-
-    .disclaimer{font-size:12px;color:#9aa3ba;line-height:1.5}
-
-    footer{margin-top:24px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:#9aa3ba}
-    footer a{color:#c9d1e8;text-decoration:none}
-    .cookie{position:fixed;left:16px;right:16px;bottom:16px;background:#0e1220;border:1px solid #232a3c;border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;box-shadow:0 20px 40px rgba(0,0,0,.35)}
-    .cookie p{margin:0;font-size:12px;color:#c3cae2}
-    .cookie .btns{display:flex;gap:8px}
-    .btn{padding:10px 14px;border-radius:10px;border:1px solid #2a3246;background:#161b2a;color:#e7ecf8;font-weight:700;cursor:pointer}
-    .btn.primary{background:var(--accent);color:#052213;border:none}
+    /* আপনার CSS আগের মতোই থাকবে */
   </style>
 </head>
 <body>
@@ -80,141 +28,28 @@
     </header>
 
     <div class="grid">
-      <!-- Left column: product + benefits -->
       <section class="card p-24">
         <div class="headline">
           <span class="offer">Limited offer</span>
-          <div class="timer" aria-live="polite">
-            Ends in
-            <span class="pill" id="t-min">10</span>:
-            <span class="pill" id="t-sec">00</span>
+          <div class="timer">
+            Ends in <span class="pill" id="t-min">10</span>:<span class="pill" id="t-sec">00</span>
           </div>
         </div>
 
         <div class="hero">
           <div class="product">
-            <img src="https://placehold.co/900x600/png" alt="Free boxer shorts">
+            <!-- এখানে আপনার ফটো লিঙ্ক -->
+            <img src="YOUR_IMAGE_URL_HERE" alt="Free boxer shorts">
             <span class="free-badge">FREE</span>
           </div>
 
           <div class="benefits">
-            <div class="benefit"><span class="tick">✓</span><div>Breathable, soft & long‑lasting materials.</div></div>
-            <div class="benefit"><span class="tick">✓</span><div>Try your first pair for <strong>£0</strong> — UK address only.</div></div>
-            <div class="benefit"><span class="tick">✓</span><div>Choose your boxer theme & size. Cancel anytime.</div></div>
-            <div class="benefit"><span class="tick">✓</span><div>Estimated delivery: <strong>2–4 working days</strong> across the UK.</div></div>
+            <div class="benefit"><span class="tick">✓</span>Breathable, soft & long-lasting materials.</div>
+            <div class="benefit"><span class="tick">✓</span>Try your first pair for <strong>£0</strong> — UK address only.</div>
+            <div class="benefit"><span class="tick">✓</span>Choose your boxer theme & size. Cancel anytime.</div>
+            <div class="benefit"><span class="tick">✓</span>Estimated delivery: <strong>2–4 working days</strong> across the UK.</div>
           </div>
 
           <div class="cta-row">
-            <a id="cta" class="cta" href="https://google.com" rel="nofollow noopener sponsored">Claim Free Trial →</a>
-            <div class="secure">🔒 256‑bit SSL • PCI compliant • No hidden fees</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right column: order summary -->
-      <aside class="card p-24 order">
-        <h2 style="margin:0 0 8px 0;font-size:18px">Order summary</h2>
-        <div class="row">
-          <div class="left">Boxer shorts <span class="uk-badge">FREE trial</span></div>
-          <div class="price free">£0.00</div>
-        </div>
-        <div class="row">
-          <div class="left">Shipped to your UK address</div>
-          <div class="price green">£0.00</div>
-        </div>
-        <div class="row">
-          <div class="left">VAT (included)</div>
-          <div class="price">£0.00</div>
-        </div>
-        <div class="row" style="border:1px dashed #2b3246;background:#0f1320">
-          <div class="left"><strong>Order total</strong></div>
-          <div class="price free"><strong>£0.00</strong></div>
-        </div>
-        <p class="disclaimer">
-          This page may contain affiliate/CPA links. By claiming the offer you agree to the partner’s Terms & Conditions. Limited stock. One claim per UK household.
-        </p>
-      </aside>
-    </div>
-
-    <footer>
-      <div>© <span id="year"></span> On That Offer</div>
-      <div>
-        <a href="#" id="pp">Privacy</a> · <a href="#" id="tc">Terms</a> · <a href="#" id="cp">Cookie Policy</a>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Cookie banner (GDPR friendly) -->
-  <div class="cookie" id="cookie" role="dialog" aria-live="polite" aria-label="Cookie notice">
-    <p>We use cookies to measure traffic and improve your experience. By using this page, you agree to our cookie policy.</p>
-    <div class="btns">
-      <button class="btn" id="cookie-decline">Decline</button>
-      <button class="btn primary" id="cookie-accept">Allow all</button>
-    </div>
-  </div>
-
-  <script>
-    // === CONFIG ===
-    // 1) Put your CPA link here (include your tracking parameters):
-    var CPA_URL = "https://example.com/your-cpa-url?sub_id={clickid}";
-
-    // 2) Optional: auto-append click id from query (?clickid=123)
-    const urlParams = new URLSearchParams(window.location.search);
-    const clickid = urlParams.get('clickid');
-    if(clickid){
-      CPA_URL = CPA_URL.replace('{clickid}', encodeURIComponent(clickid));
-    }
-
-    // Wire up CTA
-    document.getElementById('cta').setAttribute('href', CPA_URL);
-
-    // Copyright year
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // === Countdown (10-minute rolling timer, persists per session) ===
-    const T_KEY = 'uk_offer_deadline_v1';
-    const now = Date.now();
-    let deadline = sessionStorage.getItem(T_KEY);
-    if(!deadline){ deadline = now + 10*60*1000; sessionStorage.setItem(T_KEY, deadline); }
-    deadline = parseInt(deadline,10);
-
-    const tMin = document.getElementById('t-min');
-    const tSec = document.getElementById('t-sec');
-
-    function tick(){
-      const ms = Math.max(0, deadline - Date.now());
-      const s = Math.floor(ms / 1000);
-      const m = Math.floor(s / 60);
-      const r = s % 60;
-      tMin.textContent = String(m).padStart(2,'0');
-      tSec.textContent = String(r).padStart(2,'0');
-      if(ms <= 0){
-        // Extend once when it hits zero so the user can still act
-        deadline = Date.now() + 5*60*1000; // add 5 minutes
-        sessionStorage.setItem(T_KEY, deadline);
-      }
-    }
-    tick();
-    setInterval(tick, 500);
-
-    // === Cookie banner ===
-    const cookie = document.getElementById('cookie');
-    const CKEY = 'cookie_ok_v1';
-    const cookieAccepted = localStorage.getItem(CKEY);
-    if(cookieAccepted){ cookie.remove(); }
-    document.getElementById('cookie-accept').addEventListener('click', ()=>{
-      localStorage.setItem(CKEY,'1');
-      cookie.remove();
-    });
-    document.getElementById('cookie-decline').addEventListener('click', ()=>{
-      cookie.remove();
-    });
-
-    // Simple UK-only nudge (optional; not a hard block):
-    try{
-      const prefersGB = Intl.DateTimeFormat().resolvedOptions().timeZone?.includes('London');
-      if(!prefersGB){ document.title = 'UK‑Only Offer — Limited Time'; }
-    }catch(e){}
-  </script>
-</body>
-</html>
+            <!-- এখানে আপনার CPA লিঙ্ক -->
+            <a id="cta" class="cta" href="https://singingfiles.com/show.php?l=0&u=1141390&id=70892" rel="nofollo
