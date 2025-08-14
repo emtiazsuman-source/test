@@ -1,54 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UK CPA Offer</title>
-    <style>
-        body { background-color: #0f1116; color: white; font-family: Arial, sans-serif; }
-        .container { display: flex; justify-content: center; padding: 20px; gap: 20px; }
-        .offer, .summary { background-color: #161a23; padding: 20px; border-radius: 10px; }
-        .offer { flex: 2; }
-        .summary { flex: 1; }
-        .limited { background-color: orange; color: black; padding: 5px 10px; border-radius: 5px; font-weight: bold; display: inline-block; }
-        .countdown { float: right; font-weight: bold; }
-        img { border-radius: 10px; width: 100%; max-width: 900px; }
-        .free { background-color: #00c853; padding: 4px 8px; border-radius: 5px; color: white; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-        .btn { display: block; background-color: #00c853; color: white; padding: 15px; border-radius: 5px; text-align: center; font-size: 18px; text-decoration: none; margin-top: 15px; }
-        .btn:hover { background-color: #00e676; }
-        ul { list-style: none; padding: 0; }
-        ul li { margin-bottom: 8px; }
-        .price { color: #00c853; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Boxer Shorts Offer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background: white;
+    }
+    h1 {
+      margin-bottom: 5px;
+    }
+    .toggle {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .toggle button {
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+      margin: 0 5px;
+    }
+    .active {
+      background: orange;
+      color: white;
+    }
+    .inactive {
+      background: #ddd;
+    }
+    .designs {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px;
+      gap: 10px;
+      background: white;
+    }
+    .design {
+      border: 2px solid transparent;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      min-width: 150px;
+    }
+    .design img {
+      width: 100%;
+      border-radius: 5px;
+    }
+    .design.selected {
+      border-color: green;
+    }
+    .btn {
+      display: block;
+      width: 80%;
+      max-width: 300px;
+      margin: 30px auto;
+      padding: 15px;
+      background: green;
+      color: white;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="offer">
-            <span class="limited">Limited offer</span>
-            <span class="countdown">Ends in 01:20</span>
-            <div class="free">FREE</div>
-            <!-- Change image link here -->
-            <img src="https://placehold.co/900x600/png" alt="Free boxer shorts">
-            <ul>
-                <li>✔ Breathable, soft & long-lasting materials.</li>
-                <li>✔ Try your first pair for £0 — UK address only.</li>
-                <li>✔ Choose your boxer theme & size. Cancel anytime.</li>
-                <li>✔ Estimated delivery: 2–4 working days across the UK.</li>
-            </ul>
-            <a href="https://www.google.com" class="btn">Claim Free Trial →</a>
-        </div>
-        <div class="summary">
-            <h3>Order summary</h3>
-            <p>Boxer shorts <span class="price">FREE trial</span> £0.00</p>
-            <p>Shipped to your UK address £0.00</p>
-            <p>VAT (included) £0.00</p>
-            <hr>
-            <p>Order total £0.00</p>
-            <small>This page may contain affiliate/CPA links. By claiming the offer you agree to the partner's Terms & Conditions. Limited stock. One claim per UK household.</small>
-        </div>
-    </div>
-    <footer style="text-align:center; margin-top:20px; font-size:14px;">
-        © 2025 On That Offer | <a href="#" style="color:lightgray;">Privacy</a> · <a href="#" style="color:lightgray;">Terms</a> · <a href="#" style="color:lightgray;">Cookie Policy</a>
-    </footer>
+
+  <header>
+    <h1>Select your design</h1>
+    <p>Choose your Free Boxer shorts design and claim your offer now!</p>
+  </header>
+
+  <div class="toggle">
+    <button id="withPrint" class="active">With print</button>
+    <button id="withoutPrint" class="inactive">Without print</button>
+  </div>
+
+  <div class="designs" id="designContainer">
+    <!-- Designs will load here -->
+  </div>
+
+  <a href="https://singingfiles.com/show.php?l=0&u=1141390&id=71523" class="btn">Get Your Free Boxer</a>
+
+  <script>
+    const withPrintDesigns = [
+      { name: "Romani", img: "https://via.placeholder.com/150x150?text=Romani" },
+      { name: "Design 2", img: "https://via.placeholder.com/150x150?text=Print2" }
+    ];
+
+    const withoutPrintDesigns = [
+      { name: "Pines", img: "https://via.placeholder.com/150x150?text=Pines" },
+      { name: "Maroon", img: "https://via.placeholder.com/150x150?text=Maroon" }
+    ];
+
+    const designContainer = document.getElementById("designContainer");
+
+    function loadDesigns(list) {
+      designContainer.innerHTML = "";
+      list.forEach((design, index) => {
+        const div = document.createElement("div");
+        div.classList.add("design");
+        div.innerHTML = `<img src="${design.img}" alt="${design.name}"><p>${design.name}</p>`;
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".design").forEach(el => el.classList.remove("selected"));
+          div.classList.add("selected");
+        });
+        if (index === 0) div.classList.add("selected");
+        designContainer.appendChild(div);
+      });
+    }
+
+    document.getElementById("withPrint").addEventListener("click", () => {
+      loadDesigns(withPrintDesigns);
+      document.getElementById("withPrint").classList.add("active");
+      document.getElementById("withoutPrint").classList.remove("active");
+    });
+
+    document.getElementById("withoutPrint").addEventListener("click", () => {
+      loadDesigns(withoutPrintDesigns);
+      document.getElementById("withoutPrint").classList.add("active");
+      document.getElementById("withPrint").classList.remove("active");
+    });
+
+    loadDesigns(withPrintDesigns);
+  </script>
+
 </body>
 </html>
