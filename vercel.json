@@ -1,1 +1,8 @@
-
+{
+  "rewrites": [
+    {
+      "source": "/((?!api/|access-denied.html|favicon.ico).*)",
+      "destination": "/api/handler"
+    }
+  ]
+}
