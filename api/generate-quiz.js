@@ -1,9 +1,16 @@
 // This is a Vercel Serverless Function that acts as a secure proxy.
-// It receives the quiz topic and level from the frontend,
-// securely fetches the API key from Vercel's environment variables,
-// calls the Google Gemini API, and then returns the response to the frontend.
+// It now also checks for a secret key to ensure requests only come from your app.
 
 export default async function handler(request, response) {
+  // --- SECURITY CHECK: Verify the secret key from the app ---
+  const appSecretKey = process.env.APP_SECRET_KEY;
+  const incomingSecretKey = request.headers['x-app-secret-key'];
+
+  if (!appSecretKey || incomingSecretKey !== appSecretKey) {
+    // If the keys don't match, deny access.
+    return response.status(401).json({ error: 'Unauthorized Access' });
+  }
+
   // Only allow POST requests
   if (request.method !== 'POST') {
     return response.status(405).json({ message: 'Method Not Allowed' });
@@ -78,4 +85,3 @@ export default async function handler(request, response) {
     response.status(500).json({ error: 'An internal server error occurred.' });
   }
 }
-
