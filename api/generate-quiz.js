@@ -1,16 +1,7 @@
 // This is a Vercel Serverless Function that acts as a secure proxy.
-// It now also checks for a secret key to ensure requests only come from your app.
+// The secret key check has been removed, so it can be accessed from any browser.
 
 export default async function handler(request, response) {
-  // --- SECURITY CHECK: Verify the secret key from the app ---
-  const appSecretKey = process.env.APP_SECRET_KEY;
-  const incomingSecretKey = request.headers['x-app-secret-key'];
-
-  if (!appSecretKey || incomingSecretKey !== appSecretKey) {
-    // If the keys don't match, deny access.
-    return response.status(401).json({ error: 'Unauthorized Access' });
-  }
-
   // Only allow POST requests
   if (request.method !== 'POST') {
     return response.status(405).json({ message: 'Method Not Allowed' });
