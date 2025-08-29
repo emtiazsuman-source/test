@@ -72,27 +72,22 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .filter-slider {
-            position: relative;
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding: 0 1rem; /* Added padding to ensure arrows don't overlap buttons */
-        }
         .filter-buttons-container {
-            flex-grow: 1;
-            overflow-x: scroll;
+            overflow-x: auto;
             white-space: nowrap;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* Internet Explorer 10+ */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         .filter-buttons-container::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         .filter-buttons {
             display: inline-flex;
             gap: 0.5rem;
+            padding: 0 1rem;
         }
         .filter-btn {
             flex-shrink: 0;
@@ -107,21 +102,6 @@
             width: 2rem;
             height: 2rem;
             margin-bottom: 0.25rem;
-        }
-        .slider-arrow {
-            background-color: #e5e7eb;
-            padding: 0.5rem;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .slider-arrow:hover {
-            background-color: #d1d5db;
-        }
-        .slider-arrow.disabled {
-            background-color: #f3f4f6;
-            color: #d1d5db;
-            cursor: not-allowed;
         }
     </style>
 </head>
@@ -159,131 +139,91 @@
                 </button>
             </div>
 
-            <!-- Filter Slider with Arrow Buttons -->
-            <div class="filter-slider">
-                <button id="left-arrow-btn" class="slider-arrow mr-2 disabled">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <div id="filter-buttons-container" class="filter-buttons-container">
-                    <div class="filter-buttons">
-                        <button data-filter="Vintage" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M16 11.23c-1.4-.4-3.1-.7-5.1-.7-2.9 0-5.1 1.2-5.1 1.2s-2.9 1.4-2.9 5.8c0 4.4 2.9 5.8 2.9 5.8s2.2 1.2 5.1 1.2c2 0 3.7-.3 5.1-.7 1.2-.4 1.9-1.3 1.9-2.6 0-1.2-.7-2.2-1.9-2.6zM11 12.5c-2.8 0-5 1.1-5 1.1s-2.5 1.2-2.5 5c0 3.8 2.5 5 2.5 5s2.2 1.1 5 1.1c2.8 0 5-1.1 5-1.1s2.5-1.2 2.5-5c0-3.8-2.5-5-2.5-5zM11 12.5c-2.8 0-5 1.1-5 1.1s-2.5 1.2-2.5 5c0 3.8 2.5 5 2.5 5s2.2 1.1 5 1.1c2.8 0 5-1.1 5-1.1s2.5-1.2 2.5-5c0-3.8-2.5-5-2.5-5z"/>
-                                <path d="M11.972 1.966c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM11.972 20.966c-4.9 0-9-4.1-9-9s4.1-9 9-9 9 4.1 9 9-4.1 9-9 9z"/>
-                                <path d="M11.972 10.966c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3z"/>
-                            </svg>
-                            ভিনটেজ
-                        </button>
-                        <button data-filter="Black and White" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M22 16.5c0 2.2-1.8 4-4 4h-12c-2.2 0-4-1.8-4-4V7.5c0-2.2 1.8-4 4-4h12c2.2 0 4 1.8 4 4v9zM18 6.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M10 12.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM18 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M14 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M22 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M2 16.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
-                                <path d="M10 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M6 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M6 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M14 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M22 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                            </svg>
-                            সাদা-কালো
-                        </button>
-                        <button data-filter="Oil Painting" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M22 16.5c0 2.2-1.8 4-4 4h-12c-2.2 0-4-1.8-4-4V7.5c0-2.2 1.8-4 4-4h12c2.2 0 4 1.8 4 4v9zM18 6.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M10 12.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM18 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M14 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M22 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M2 16.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
-                                <path d="M10 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M6 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M6 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M14 10.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                                <path d="M22 16.5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-                            </svg>
-                            অয়েল পেইন্টিং
-                        </button>
-                        <button data-filter="Cartoon" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            কার্টুন
-                        </button>
-                        <button data-filter="Sketch" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 12c0 3.9-3.1 7-7 7s-7-3.1-7-7 3.1-7 7-7 7 3.1 7 7z"/>
-                                <path d="M19 12c0 3.9-3.1 7-7 7s-7-3.1-7-7 3.1-7 7-7 7 3.1 7 7z"/>
-                                <path d="M12 5c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7z"/>
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M15 15c-.6 0-1.2.1-1.8.4-.7.4-1.2.9-1.7 1.6-.2.4-.2.8 0 1.2.4.6.8 1.1 1.4 1.4.6.3 1.2.4 1.8.4 1.7 0 3-1.3 3-3s-1.3-3-3-3z"/>
-                                <path d="M9 15c-.6 0-1.2.1-1.8.4-.7.4-1.2.9-1.7 1.6-.2.4-.2.8 0 1.2.4.6.8 1.1 1.4 1.4.6.3 1.2.4 1.8.4 1.7 0 3-1.3 3-3s-1.3-3-3-3z"/>
-                            </svg>
-                            স্কেচ
-                        </button>
-                        <button data-filter="Background Blur" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            ব্যাকগ্রাউন্ড ব্লার
-                        </button>
-                        <button data-filter="Enhance" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            এনহ্যান্স
-                        </button>
-                        <button data-filter="Pop Art" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            পপ আর্ট
-                        </button>
-                        <button data-filter="Cyberpunk" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            সাইবারপাঙ্ক
-                        </button>
-                        <button data-filter="Neon" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zM12 20c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
-                                <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                                <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
-                            </svg>
-                            নিওন
-                        </button>
-                    </div>
+            <!-- Filter Buttons (scrollable container) -->
+            <div class="filter-buttons-container">
+                <div class="filter-buttons">
+                    <button data-filter="Vintage" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <circle cx="15.5" cy="8.5" r="1.5"/>
+                            <path d="M12 17.5c-2.33 0-4.32-1.01-5.74-2.52C5.69 14.51 5 13.3 5 12h14c0 1.3-0.69 2.51-1.26 3.98-1.42 1.51-3.41 2.52-5.74 2.52z"/>
+                        </svg>
+                        ভিনটেজ
+                    </button>
+                    <button data-filter="Black and White" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12 4c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        </svg>
+                        সাদা-কালো
+                    </button>
+                    <button data-filter="Oil Painting" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.89 12.01c0 3.73-3.14 6.75-7 6.75-3.87 0-7-3.02-7-6.75s3.13-6.75 7-6.75c3.86 0 7 3.02 7 6.75z"/>
+                            <path d="M20.39 12.01c0 4.58-3.8 8.25-8.49 8.25-4.7 0-8.5-3.67-8.5-8.25S7.2 3.76 11.9 3.76c4.69 0 8.49 3.67 8.49 8.25zM12 5.51c-3.5 0-6.35 2.85-6.35 6.35s2.85 6.35 6.35 6.35 6.35-2.85 6.35-6.35-2.85-6.35-6.35-6.35z"/>
+                        </svg>
+                        অয়েল পেইন্টিং
+                    </button>
+                    <button data-filter="Cartoon" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1.5 14h-13c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5h13c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+                        </svg>
+                        কার্টুন
+                    </button>
+                    <button data-filter="Sketch" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/>
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                        স্কেচ
+                    </button>
+                    <button data-filter="Background Blur" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <circle cx="12" cy="12" r="4"/>
+                        </svg>
+                        ব্যাকগ্রাউন্ড ব্লার
+                    </button>
+                    <button data-filter="Enhance" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-9h4v2h-4z"/>
+                            <path d="M16 11h-4V7h-2v4H6v2h4v4h2v-4h4z"/>
+                        </svg>
+                        এনহ্যান্স
+                    </button>
+                    <button data-filter="Pop Art" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
+                        </svg>
+                        পপ আর্ট
+                    </button>
+                    <button data-filter="Cyberpunk" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
+                        </svg>
+                        সাইবারপাঙ্ক
+                    </button>
+                    <button data-filter="Neon" class="filter-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            <path d="M12 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M16 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M8 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                            <path d="M12 18c-2.2 0-4-1.8-4-4h8c0 2.2-1.8 4-4 4z"/>
+                        </svg>
+                        নিওন
+                    </button>
                 </div>
-                <button id="right-arrow-btn" class="slider-arrow ml-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
             </div>
 
             <!-- Apply Filter Button (now separate) -->
@@ -316,9 +256,7 @@
         const selectBtn = document.getElementById('select-btn');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const filterButtonsContainer = document.getElementById('filter-buttons-container');
-        const leftArrowBtn = document.getElementById('left-arrow-btn');
-        const rightArrowBtn = document.getElementById('right-arrow-btn');
-
+        
         let uploadedImageBase64 = null;
         let imageHistory = [];
         let historyIndex = -1;
@@ -369,22 +307,6 @@
             redoBtn.disabled = historyIndex >= imageHistory.length - 1;
         }
         
-        /**
-         * Updates the state of the slider arrow buttons based on scroll position.
-         */
-        function updateSliderArrows() {
-            if (filterButtonsContainer.scrollLeft === 0) {
-                leftArrowBtn.classList.add('disabled');
-            } else {
-                leftArrowBtn.classList.remove('disabled');
-            }
-            if (filterButtonsContainer.scrollLeft + filterButtonsContainer.clientWidth >= filterButtonsContainer.scrollWidth) {
-                rightArrowBtn.classList.add('disabled');
-            } else {
-                rightArrowBtn.classList.remove('disabled');
-            }
-        }
-
         /**
          * Shows a message in the message box.
          * @param {string} text - The message text.
@@ -570,29 +492,9 @@
                 showMessage('The current version has been selected for editing.', 'success');
             }
         });
-        
-        // Event listener for the left arrow
-        leftArrowBtn.addEventListener('click', () => {
-            filterButtonsContainer.scrollBy({
-                left: -150, // scroll a fixed amount
-                behavior: 'smooth'
-            });
-        });
-
-        // Event listener for the right arrow
-        rightArrowBtn.addEventListener('click', () => {
-            filterButtonsContainer.scrollBy({
-                left: 150, // scroll a fixed amount
-                behavior: 'smooth'
-            });
-        });
-        
-        // Event listener for scroll to update arrows
-        filterButtonsContainer.addEventListener('scroll', updateSliderArrows);
 
         // Initial state of the buttons
         updateHistoryButtons();
-        updateSliderArrows();
     </script>
 </body>
 </html>
