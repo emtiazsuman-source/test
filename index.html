@@ -121,11 +121,13 @@
             height: 70px;
             border-radius: 12px;
             border: 2px solid transparent;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
             position: relative;
         }
         .filter-btn.active {
             border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+            box-sizing: border-box; 
         }
         .filter-btn img {
             width: 100%;
@@ -234,7 +236,7 @@
             { name: 'Background Blur', prompt: 'Apply a strong background blur to the image while keeping the main subject in focus.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhTh7Xx0lFiN9-x3aIg2ZeKdRwXTx9nO83JUxRjcA-Q12VXOM6Yx_W6Z3Mf4QDXa2STdsjFx4T0AGUKRZ29bZ9hamSFN2s6oJ6L5SLvxRUtWOEDMxmRlDlU7M4cVdPsH4OGs9H_hURxsWF_B9jR9JuD6RWFvthFU8YWMqTBs2xo4Wa9P1BakdhXTeDrzug/s101/Background%20blur.png' },
             { name: 'Face Enhance', prompt: 'Enhance the facial features, skin and overall quality of the face in this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiaRZlxlMTM9sOmccmPBEDVuoGTRju-pJlLBMUJtxffkhwOkw3cpfEyHix9ZyLP63PMMMxMoQJKHryD-PM6PotfuVSCeq74S13aHmrN8HSbUCzjDI1VMlIMzGz41TzEYSXdDp7aV6l7mMAn_xtJ8lRxMbePwvsgDNSSxaw6mpTMm7HuMgFE7IRPnFmSxzM/s96/face%20enhance%20(1).png' },
             { name: 'Pop Art', prompt: 'Pop Art style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPbNLdLnFPJoBoq8apc160qg6WwvT_aNINtiROEcNtBEo1pYGCdrzOYBb1s8M64COJRzo4Z9676j5AxeUVVWbanaPGCMcBlRa2VknkwT4TAuHS797jv9YMVUtEvzCUXUvnT6eyX5p2jGbPnG5uO0Ezt6ln8I33hiW0Gs1KxFYjvscBEf-04q1dcbBZdAk/s97/popurt.png' },
-            { name: 'Cyberpunk', prompt: 'Cyberpunk style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgqicsqdZIe96VpOLTiZiHctYVUvbEi7ngzEm4JLPmhLJrUhCQiz0Gt6UR6ypj4k5X-_BlZ1PWKLzAuwEQw-HN6uXtXKMunaR1An6Xzr7i0IUyB6pvaKSxoGHwOsHQ8JTRJTMuIeUJzeXIwJ0vB_x5jm0xTMhEyEp_BSidpTptPHTTJspAlOzxZV8eOuPM/s97/Cyberpunk.png' },
+            { name: 'Cyberpunk', prompt: 'Cyberpunk style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgqicsqdZIe96VpOLTiZiHctYVUvbEi7ngzEm4JLPmhLJrUhCQiz0Gt6UR6ypj4k5X-_BlZ1PWKLzAuwEQw-HN6uXtXKMunaR1An6Xzr7i0IUyB6pvaKSxoGHwOsHQ8JTRJTMuIeUJzeXIwJ0vB_xjm0xTMhEyEp_BSidpTptPHTTJspAlOzxZV8eOuPM/s97/Cyberpunk.png' },
             { name: 'Neon', prompt: 'Neon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRYn4iBd-fol6Zdb9YK0QwXxt4J3z9qGLAGI1uzKnYpF2uRrAPSeseVhp4tNcfEExZV0_lFYzlaUkOzY-yZ6va84mzCdgMCzST4DYFQESoJkplSdsxrGlBt9hsNAVDwfJaKfpduQ1lxLy3jKQBidU-l7EfvoLumImwOYD2m27BZswkjyQeDuKesfAGkkQ/s99/Neno.png' }
         ];
 
@@ -244,7 +246,9 @@
                 const button = document.createElement('button');
                 button.dataset.filter = filter.name;
                 button.classList.add('filter-btn');
-                button.innerHTML = `<img src="${filter.image}" alt="${filter.name} Icon" /><br /><span>${filter.name}</span>`;
+                button.innerHTML = `<span>${filter.name}</span>`;
+                button.style.backgroundImage = `url('${filter.image}')`;
+                
                 button.addEventListener('click', () => {
                     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
@@ -480,4 +484,3 @@
     </script>
 </body>
 </html>
-```
