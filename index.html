@@ -126,8 +126,8 @@
             box-sizing: border-box; 
         }
         .filter-btn img {
-            width: 60px; /* Adjust size as needed */
-            height: 60px; /* Adjust size as needed */
+            width: 60px;
+            height: 60px;
             object-fit: cover;
             border-radius: 8px;
         }
@@ -224,16 +224,21 @@
         let isProcessing = false;
 
         const filters = [
-            { name: 'Vintage', prompt: 'Vintage style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi-MLQ7HL_MILjgFgY67ejTil-82vRv_gyTSBJdYstr3tUG-8LRaHPcqbsjAHhe8STM4l8DxcJi_zqYjnQ2bghW5uW-XhfImxPyXsWTo6FjuXZxl0Xg08QBSvM6aYjCZfAvDbIrraFjVMlTwK8bthCcyawkUP2zdG8H6K6s-3_vxItGjcDtDBYzApVVGeg/s98/Vintage.png' },
-            { name: 'B&W', prompt: 'Black and White photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhhDSAtpxrtlOfbzOrTd0y95susZmGHqJ6ZduojAKejJxoG37WwDnbpEn2sHn0ytD-Qda4a6WznWewgA2N6bQS6nbxPr2LwJoFeyEIeSjggakfMiRcVWk3wMRo8tkCPZiRQ9GyXe8zy9JSOrbFsOgs7BurPutKPgTJnHZSwJPHLl_-1mF5lqf1sLexL1gk/s101/Black%20&%20white.png' },
+            // Face & Background
+            { name: 'Face Enhance', prompt: 'Enhance the facial features, skin and overall quality of the face in this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiaRZlxlMTM9sOmccmPBEDVuoGTRju-pJlLBMUJtxffkhwOkw3cpfEyHix9ZyLP63PMMMxMoQJKHryD-PM6PotfuVSCeq74S13aHmrN8HSbUCzjDI1VMlIMzGz41TzEYSXdDp7aV6l7mMAn_xtJ8lRxMbePwvsgDNSSxaw6mpTMm7HuMgFE7IRPnFmSxzM/s96/face%20enhance%20(1).png' },
+            { name: 'Background Blur', prompt: 'Apply a strong background blur to the image while keeping the main subject in focus.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhTh7Xx0lFiN9-x3aIg2ZeKdRwXTx9nO83JUxRjcA-Q12VXOM6Yx_W6Z3Mf4QDXa2STdsjFx4T0AGUKRZ29bZ9hamSFN2s6oJ6L5SLvxRUtWOEDMxmRlDlU7M4cVdPsH4OGs9H_hURxsWF_B9jR9JuD6RWFvthFU8YWMqTBs2xo4Wa9P1BakdhXTeDrzug/s101/Background%20blur.png' },
+
+            // Artistic
             { name: 'Oil Paint', prompt: 'Oil Painting style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgVLnRkdpgcRyRQfIb3g4evgo63JpaZQs0hcIuepIghQc9oKQTAgIJr4-qG5aW9FdZmFqyIbv9cWUVwJy53678VwMWVdPRjWNT-D6L9jwMZcc_zpWD3vdCHexhf3_Oh7vRUbGuivUBlJYZIXBavtTu7v28Icg7u_GXOSqTxAqmH84CGbNDC0H7o0cQ8o0w/s98/Oil%20painting.png' },
             { name: 'Cartoon', prompt: 'Cartoon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiOS-nH2qBQW14Bt8__YQNsIDh53RIP4qfBX6R5lRwbfEiZBlMk89nLrq15lpxooQsQI5hBET1anhC4KKPRxFYz0ZLk0ZZW4kHLCW6irSVD6rdCs15yslCQLs62fFuUEovNgTPz2mQREg_oXLfrZKtD-1Y2vbZ7YvqrYc8fvJlN-uGFsr4VrhslNoMmjNo/s99/cartoon.png' },
             { name: 'Sketch', prompt: 'Sketch style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjTgJ51_foXUUEWICn5cNhyPNu6iPSAFZc6oHAoILV3HAQezgqoyTvrbyUayH0h610Pk39jeoKx0qaCDhTMUOrNnhmE51S9RI48Mo3Jnazm8kAkgFj6qrylLEml_Z_Oo6L0dZ67dDD4nPi1ZRW1ANY_W00uHtQ6Oy-gwhxrTn8ysFkHkYI20qjZLGvKR7Y/s98/stetch.png' },
-            { name: 'Background Blur', prompt: 'Apply a strong background blur to the image while keeping the main subject in focus.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhTh7Xx0lFiN9-x3aIg2ZeKdRwXTx9nO83JUxRjcA-Q12VXOM6Yx_W6Z3Mf4QDXa2STdsjFx4T0AGUKRZ29bZ9hamSFN2s6oJ6L5SLvxRUtWOEDMxmRlDlU7M4cVdPsH4OGs9H_hURxsWF_B9jR9JuD6RWFvthFU8YWMqTBs2xo4Wa9P1BakdhXTeDrzug/s101/Background%20blur.png' },
-            { name: 'Face Enhance', prompt: 'Enhance the facial features, skin and overall quality of the face in this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhlLnP1sMgph2FBFxtB3pvs62rA5WChdXKyW_M3kIixIHTjc-S7iEVLbGAv852YFWO3gUtl5aMNiWsD7moacs6uENoZoMbAAxpyJrFFxV1loEiA3J-HlXjFpa5qAdKXa3c6wSeCitWkcU96w7z10gTXsN9iTmmhTU21y2hyphenhyphenCLVgnLHRdx-0nJY6o4yMXeI/s97/face%20enhance.png' },
             { name: 'Pop Art', prompt: 'Pop Art style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPbNLdLnFPJoBoq8apc160qg6WwvT_aNINtiROEcNtBEo1pYGCdrzOYBb1s8M64COJRzo4Z9676j5AxeUVVWbanaPGCMcBlRa2VknkwT4TAuHS797jv9YMVUtEvzCUXUvnT6eyX5p2jGbPnG5uO0Ezt6ln8I33hiW0Gs1KxFYjvscBEf-04q1dcbBZdAk/s97/popurt.png' },
             { name: 'Cyberpunk', prompt: 'Cyberpunk style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgqicsqdZIe96VpOLTiZiHctYVUvbEi7ngzEm4JLPmhLJrUhCQiz0Gt6UR6ypj4k5X-_BlZ1PWKLzAuwEQw-HN6uXtXKMunaR1An6Xzr7i0IUyB6pvaKSxoGHwOsHQ8JTRJTMuIeUJzeXIwJ0vB_x5jm0xTMhEyEp_BSidpTptPHTTJspAlOzxZV8eOuPM/s97/Cyberpunk.png' },
-            { name: 'Neon', prompt: 'Neon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRYn4iBd-fol6Zdb9YK0QwXxt4J3z9qGLAGI1uzKnYpF2uRrAPSeseVhp4tNcfEExZV0_lFYzlaUkOzY-yZ6va84mzCdgMCzST4DYFQESoJkplSdsxrGlBt9hsNAVDwfJaKfpduQ1lxLy3jKQBidU-l7EfvoLumImwOYD2m27BZswkjyQeDuKesfAGkkQ/s99/Neno.png' }
+            { name: 'Neon', prompt: 'Neon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRYn4iBd-fol6Zdb9YK0QwXxt4J3z9qGLAGI1uzKnYpF2uRrAPSeseVhp4tNcfEExZV0_lFYzlaUkOzY-yZ6va84mzCdgMCzST4DYFQESoJkplSdsxrGlBt9hsNAVDwfJaKfpduQ1lxLy3jKQBidU-l7EfvoLumImwOYD2m27BZswkjyQeDuKesfAGkkQ/s99/Neno.png' },
+
+            // Traditional
+            { name: 'Vintage', prompt: 'Vintage style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi-MLQ7HL_MILjgFgY67ejTil-82vRv_gyTSBJdYstr3tUG-8LRaHPcqbsjAHhe8STM4l8DxcJi_zqYjnQ2bghW5uW-XhfImxPyXsWTo6FjuXZxl0Xg08QBSvM6aYjCZfAvDbIrraFjVMlTwK8bthCcyawkUP2zdG8H6K6s-3_vxItGjcDtDBYzApVVGeg/s98/Vintage.png' },
+            { name: 'B&W', prompt: 'Black and White photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhhDSAtpxrtlOfbzOrTd0y95susZmGHqJ6ZduojAKejJxoG37WwDnbpEn2sHn0ytD-Qda4a6WznWewgA2N6bQS6nbxPr2LwJoFeyEIeSjggakfMiRcVWk3wMRo8tkCPZiRQ9GyXe8zy9JSOrbFsOgs7BurPutKPgTJnHZSwJPHLl_-1mF5lqf1sLexL1gk/s101/Black%20&%20white.png' },
         ];
 
         function generateFilterButtons() {
