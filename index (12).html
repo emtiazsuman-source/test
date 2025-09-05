@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Photo Filter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .image-display-box {
+            position: relative;
+            min-height: 350px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f0f4f8, #e0eaf1);
+            border: 2px dashed #aebed0;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .image-display-box img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .placeholder-content {
+            color: #6b7280;
+            font-size: 1rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        .placeholder-content svg {
+            width: 4rem;
+            height: 4rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .image-display-box:hover .placeholder-content svg {
+            transform: scale(1.1);
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .filter-buttons-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .filter-buttons-container::-webkit-scrollbar {
+            display: none;
+        }
+        .filter-buttons {
+            display: inline-flex;
+            gap: 1rem;
+            padding: 0 1rem;
+            padding-bottom: 1rem;
+        }
+        .filter-btn {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .filter-btn.active {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+            box-sizing: border-box; 
+        }
+        .filter-btn img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .filter-btn span {
+            color: #4b5563;
+            margin-top: 0.25rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+            white-space: normal;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">এআই ফটো ফিল্টার</h1>
+        <p class="text-gray-600 mb-8">একটি ছবি আপলোড করুন এবং এআই এর জাদু দেখুন</p>
+
+        <!-- Main Image Display Area -->
+        <div id="image-display-box" class="image-display-box">
+            <span id="placeholder-content" class="placeholder-content">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75L5.25 18.75L12 12L18.75 18.75L21.75 15.75L12 6.5L2.25 15.75z"/>
+                </svg>
+                ছবি আপলোড করতে ক্লিক করুন
+            </span>
+            <img id="image-preview" src="" alt="" class="hidden" />
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="spinner mb-4"></div>
+                <span class="text-gray-700 font-semibold">প্রসেসিং হচ্ছে...</span>
+            </div>
+        </div>
+        
+        <!-- Controls and Buttons -->
+        <div class="space-y-4">
+            <input type="file" id="image-upload" accept="image/*" class="hidden" />
+
+            <!-- History Navigation and Selection Buttons -->
+            <div class="flex items-center justify-center space-x-2">
+                <button id="undo-btn" class="px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400">
+                    পূর্বাবস্থায় ফিরিয়ে আনুন
+                </button>
+                <button id="redo-btn" class="px-4 py-2 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors disabled:bg-gray-100 disabled:text-gray-400">
+                    পুনরায় করুন
+                </button>
+                <button id="select-btn" class="px-4 py-2 rounded-full font-semibold text-white bg-purple-600 hover:bg-purple-700 transition-colors hidden">
+                    এই সংস্করণটি নির্বাচন করুন
+                </button>
+            </div>
+
+            <!-- Filter Buttons (scrollable container) -->
+            <div class="filter-buttons-container">
+                <div class="filter-buttons" id="filter-buttons-list">
+                    <!-- Buttons will be dynamically generated here -->
+                </div>
+            </div>
+
+            <!-- Apply Filter Button (now separate) -->
+            <button id="apply-filter-btn" class="w-full sm:w-auto px-6 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors disabled:bg-gray-400">
+                    ফিল্টার প্রয়োগ করুন
+            </button>
+            
+            <!-- Download Button (Initially hidden) -->
+            <button id="download-btn" class="hidden w-full px-6 py-2 rounded-full font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors">
+                ছবি ডাউনলোড করুন
+            </button>
+        </div>
+
+        <!-- Message Area -->
+        <div id="message-box" class="mt-4 p-4 text-sm text-center rounded-lg hidden"></div>
+    </div>
+
+    <script>
+        // DOM element references
+        const imageUpload = document.getElementById('image-upload');
+        const applyFilterBtn = document.getElementById('apply-filter-btn');
+        const imagePreview = document.getElementById('image-preview');
+        const placeholderContent = document.getElementById('placeholder-content');
+        const imageDisplayBox = document.getElementById('image-display-box');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const messageBox = document.getElementById('message-box');
+        const downloadBtn = document.getElementById('download-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+        const selectBtn = document.getElementById('select-btn');
+        const filterButtonsList = document.getElementById('filter-buttons-list');
+        
+        let uploadedImageBase64 = null;
+        let imageHistory = [];
+        let historyIndex = -1;
+        let selectedFilter = null;
+        let isProcessing = false;
+
+        const filters = [
+            // Face & Background
+            { name: 'Face Enhance', prompt: 'Enhance the facial features, skin and overall quality of the face in this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiaRZlxlMTM9sOmccmPBEDVuoGTRju-pJlLBMUJtxffkhwOkw3cpfEyHix9ZyLP63PMMMxMoQJKHryD-PM6PotfuVSCeq74S13aHmrN8HSbUCzjDI1VMlIMzGz41TzEYSXdDp7aV6l7mMAn_xtJ8lRxMbePwvsgDNSSxaw6mpTMm7HuMgFE7IRPnFmSxzM/s96/face%20enhance%20(1).png' },
+            { name: 'Background Blur', prompt: 'Apply a strong background blur to the image while keeping the main subject in focus.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhTh7Xx0lFiN9-x3aIg2ZeKdRwXTx9nO83JUxRjcA-Q12VXOM6Yx_W6Z3Mf4QDXa2STdsjFx4T0AGUKRZ29bZ9hamSFN2s6oJ6L5SLvxRUtWOEDMxmRlDlU7M4cVdPsH4OGs9H_hURxsWF_B9jR9JuD6RWFvthFU8YWMqTBs2xo4Wa9P1BakdhXTeDrzug/s101/Background%20blur.png' },
+
+            // Artistic
+            { name: 'Oil Paint', prompt: 'Oil Painting style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgVLnRkdpgcRyRQfIb3g4evgo63JpaZQs0hcIuepIghQc9oKQTAgIJr4-qG5aW9FdZmFqyIbv9cWUVwJy53678VwMWVdPRjWNT-D6L9jwMZcc_zpWD3vdCHexhf3_Oh7vRUbGuivUBlJYZIXBavtTu7v28Icg7u_GXOSqTxAqmH84CGbNDC0H7o0cQ8o0w/s98/Oil%20painting.png' },
+            { name: 'Cartoon', prompt: 'Cartoon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiOS-nH2qBQW14Bt8__YQNsIDh53RIP4qfBX6R5lRwbfEiZBlMk89nLrq15lpxooQsQI5hBET1anhC4KKPRxFYz0ZLk0ZZW4kHLCW6irSVD6rdCs15yslCQLs62fFuUEovNgTPz2mQREg_oXLfrZKtD-1Y2vbZ7YvqrYc8fvJlN-uGFsr4VrhslNoMmjNo/s99/cartoon.png' },
+            { name: 'Sketch', prompt: 'Sketch style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjTgJ51_foXUUEWICn5cNhyPNu6iPSAFZc6oHAoILV3HAQezgqoyTvrbyUayH0h610Pk39jeoKx0qaCDhTMUOrNnhmE51S9RI48Mo3Jnazm8kAkgFj6qrylLEml_Z_Oo6L0dZ67dDD4nPi1ZRW1ANY_W00uHtQ6Oy-gwhxrTn8ysFkHkYI20qjZLGvKR7Y/s98/stetch.png' },
+            { name: 'Pop Art', prompt: 'Pop Art style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPbNLdLnFPJoBoq8apc160qg6WwvT_aNINtiROEcNtBEo1pYGCdrzOYBb1s8M64COJRzo4Z9676j5AxeUVVWbanaPGCMcBlRa2VknkwT4TAuHS797jv9YMVUtEvzCUXUvnT6eyX5p2jGbPnG5uO0Ezt6ln8I33hiW0Gs1KxFYjvscBEf-04q1dcbBZdAk/s97/popurt.png' },
+            { name: 'Cyberpunk', prompt: 'Cyberpunk style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgqicsqdZIe96VpOLTiZiHctYVUvbEi7ngzEm4JLPmhLJrUhCQiz0Gt6UR6ypj4k5X-_BlZ1PWKLzAuwEQw-HN6uXtXKMunaR1An6Xzr7i0IUyB6pvaKSxoGHwOsHQ8JTRJTMuIeUJzeXIwJ0vB_x5jm0xTMhEyEp_BSidpTptPHTTJspAlOzxZV8eOuPM/s97/Cyberpunk.png' },
+            { name: 'Neon', prompt: 'Neon style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjRYn4iBd-fol6Zdb9YK0QwXxt4J3z9qGLAGI1uzKnYpF2uRrAPSeseVhp4tNcfEExZV0_lFYzlaUkOzY-yZ6va84mzCdgMCzST4DYFQESoJkplSdsxrGlBt9hsNAVDwfJaKfpduQ1lxLy3jKQBidU-l7EfvoLumImwOYD2m27BZswkjyQeDuKesfAGkkQ/s99/Neno.png' },
+
+            // Traditional
+            { name: 'Vintage', prompt: 'Vintage style photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi-MLQ7HL_MILjgFgY67ejTil-82vRv_gyTSBJdYstr3tUG-8LRaHPcqbsjAHhe8STM4l8DxcJi_zqYjnQ2bghW5uW-XhfImxPyXsWTo6FjuXZxl0Xg08QBSvM6aYjCZfAvDbIrraFjVMlTwK8bthCcyawkUP2zdG8H6K6s-3_vxItGjcDtDBYzApVVGeg/s98/Vintage.png' },
+            { name: 'B&W', prompt: 'Black and White photo effect on this image.', image: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhhDSAtpxrtlOfbzOrTd0y95susZmGHqJ6ZduojAKejJxoG37WwDnbpEn2sHn0ytD-Qda4a6WznWewgA2N6bQS6nbxPr2LwJoFeyEIeSjggakfMiRcVWk3wMRo8tkCPZiRQ9GyXe8zy9JSOrbFsOgs7BurPutKPgTJnHZSwJPHLl_-1mF5lqf1sLexL1gk/s101/Black%20&%20white.png' },
+        ];
+
+        function generateFilterButtons() {
+            filterButtonsList.innerHTML = '';
+            filters.forEach(filter => {
+                const button = document.createElement('button');
+                button.dataset.filter = filter.name;
+                button.classList.add('filter-btn');
+                
+                // Create an image element
+                const img = document.createElement('img');
+                img.src = filter.image;
+                img.alt = filter.name + ' filter preview';
+
+                // Create a span for the text
+                const span = document.createElement('span');
+                span.textContent = filter.name;
+
+                // Append image and span to the button
+                button.appendChild(img);
+                button.appendChild(span);
+                
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    selectedFilter = filter.name;
+                });
+                filterButtonsList.appendChild(button);
+            });
+        }
+        
+        /**
+         * Clears all placeholders and previous images.
+         */
+        function resetView() {
+            imagePreview.src = '';
+            imagePreview.classList.add('hidden');
+            if (placeholderContent) {
+                placeholderContent.classList.remove('hidden');
+            }
+            downloadBtn.classList.add('hidden');
+            applyFilterBtn.disabled = false;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            selectedFilter = null;
+        }
+        
+        /**
+         * Updates the image display and history.
+         * @param {string} imageData - Base64 string of the image.
+         */
+        function updateImage(imageData) {
+            imagePreview.src = `data:image/jpeg;base64,${imageData}`;
+            imagePreview.classList.remove('hidden');
+            if (placeholderContent) {
+                placeholderContent.classList.add('hidden');
+            }
+            downloadBtn.classList.remove('hidden');
+            selectBtn.classList.remove('hidden');
+        }
+
+        /**
+         * Adds an image to the history stack.
+         * @param {string} imageData - Base64 string of the image.
+         */
+        function addHistory(imageData) {
+            if (historyIndex < imageHistory.length - 1) {
+                imageHistory = imageHistory.slice(0, historyIndex + 1);
+            }
+            imageHistory.push(imageData);
+            historyIndex++;
+            updateHistoryButtons();
+        }
+
+        /**
+         * Updates the state of the undo/redo buttons.
+         */
+        function updateHistoryButtons() {
+            undoBtn.disabled = historyIndex <= 0;
+            redoBtn.disabled = historyIndex >= imageHistory.length - 1;
+        }
+        
+        /**
+         * Shows a message in the message box.
+         * @param {string} text - The message text.
+         * @param {string} type - The type of message ('success', 'error', 'info').
+         */
+        function showMessage(text, type) {
+            messageBox.textContent = text;
+            messageBox.classList.remove('hidden');
+            messageBox.classList.remove('bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700', 'bg-blue-100', 'text-blue-700');
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-700');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageBox.classList.add('bg-blue-100', 'text-blue-700');
+            }
+        }
+        
+        // Event listener for image upload area click
+        imageDisplayBox.addEventListener('click', () => {
+            if (isProcessing) {
+                return;
+            }
+            imageUpload.click();
+        });
+
+        // Event listener for image upload
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64Data = reader.result.split(',')[1];
+                    uploadedImageBase64 = base64Data;
+                    imageHistory = [];
+                    historyIndex = -1;
+                    addHistory(base64Data);
+                    updateImage(base64Data);
+                    messageBox.classList.add('hidden');
+                    applyFilterBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Event listener for the "Apply Filter" button
+        applyFilterBtn.addEventListener('click', async () => {
+            if (!uploadedImageBase64) {
+                showMessage('একটি ছবি আপলোড করুন', 'error');
+                return;
+            }
+
+            if (!selectedFilter) {
+                showMessage('একটি ফিল্টার নির্বাচন করুন', 'error');
+                return;
+            }
+
+            loadingOverlay.classList.remove('hidden');
+            messageBox.classList.add('hidden');
+            isProcessing = true;
+            applyFilterBtn.disabled = true;
+
+            const selectedFilterObject = filters.find(f => f.name === selectedFilter);
+            const userPrompt = selectedFilterObject.prompt;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: userPrompt },
+                        {
+                            inlineData: {
+                                mimeType: "image/jpeg",
+                                data: imageHistory[historyIndex]
+                            }
+                        }
+                    ]
+                }],
+                generationConfig: {
+                    responseModalities: ["IMAGE"]
+                },
+            };
+
+            let retries = 0;
+            const maxRetries = 3;
+            let success = false;
+            let lastError = null;
+
+            while (retries < maxRetries && !success) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API error: ${response.statusText} - ${errorData.error.message}`);
+                    }
+
+                    const result = await response.json();
+                    const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+                    if (!base64Data) {
+                        throw new Error('No image was received from the API.');
+                    }
+
+                    addHistory(base64Data);
+                    updateImage(base64Data);
+                    showMessage('ফিল্টার সফলভাবে প্রয়োগ করা হয়েছে!', 'success');
+                    success = true;
+
+                } catch (error) {
+                    console.error('Error applying filter:', error);
+                    lastError = error;
+                    retries++;
+                    await new Promise(res => setTimeout(res, Math.pow(2, retries) * 1000));
+                }
+            }
+            
+            if (!success) {
+                showMessage(`ফিল্টার প্রয়োগে ব্যর্থতা: ${lastError.message}`, 'error');
+            }
+
+            loadingOverlay.classList.add('hidden');
+            isProcessing = false;
+            applyFilterBtn.disabled = false;
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (historyIndex >= 0) {
+                const link = document.createElement('a');
+                link.href = `data:image/jpeg;base64,${imageHistory[historyIndex]}`;
+                link.download = 'filtered_photo.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+        
+        undoBtn.addEventListener('click', () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                updateImage(imageHistory[historyIndex]);
+                updateHistoryButtons();
+                showMessage('পূর্বাবস্থায় সফলভাবে ফিরিয়ে আনা হয়েছে।', 'info');
+            }
+        });
+
+        redoBtn.addEventListener('click', () => {
+            if (historyIndex < imageHistory.length - 1) {
+                historyIndex++;
+                updateImage(imageHistory[historyIndex]);
+                updateHistoryButtons();
+                showMessage('পুনরায় সফলভাবে সম্পন্ন হয়েছে।', 'info');
+            }
+        });
+        
+        selectBtn.addEventListener('click', () => {
+            if (historyIndex >= 0) {
+                imageHistory = imageHistory.slice(0, historyIndex + 1);
+                updateHistoryButtons();
+                showMessage('বর্তমান সংস্করণটি সম্পাদনার জন্য নির্বাচিত হয়েছে।', 'success');
+            }
+        });
+
+        window.onload = function() {
+            generateFilterButtons();
+            updateHistoryButtons();
+        }
+    </script>
+</body>
+</html>
