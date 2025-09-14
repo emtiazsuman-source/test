@@ -483,10 +483,20 @@
                         <button type="button" id="add-prize-btn" class="mt-2 text-sm text-blue-600 hover:underline font-semibold">+ আরও পুরস্কার যোগ করুন</button>
                     </div>
                     <button type="submit" class="w-full bg-orange-600 text-white font-semibold py-2 rounded-lg hover:bg-orange-700 transition mt-4">পোস্ট করুন</button>
-                </form>
+                    
+                    <div class="flex items-center space-x-2 mt-2">
+                        <button type="button" id="save-draft-btn" class="w-full bg-gray-500 text-white font-semibold py-2 rounded-lg hover:bg-gray-600 transition">ড্রাফট সেভ করুন</button>
+                        <button type="button" id="load-draft-btn" class="w-full bg-blue-500 text-white font-semibold py-2 rounded-lg hover:bg-blue-600 transition">ড্রাফট লোড করুন</button>
+                    </div>
+                    </form>
             `;
             document.getElementById('contest-post-form').onsubmit = handleContestPost;
             document.getElementById('add-prize-btn').onclick = addPrizeField;
+
+            // START: Draft Button Listeners Added
+            document.getElementById('save-draft-btn').onclick = handleSaveDraft;
+            document.getElementById('load-draft-btn').onclick = handleLoadDraft;
+            // END: Draft Button Listeners Added
         };
 
         const addPrizeField = (position = '', amount = '') => {
@@ -502,6 +512,60 @@
             prizeField.querySelector('.remove-prize-btn').onclick = () => prizeField.remove();
             container.appendChild(prizeField);
         };
+
+        // START: Draft Functions Added
+        const handleSaveDraft = () => {
+            const form = document.getElementById('contest-post-form');
+            const formData = new FormData(form);
+            const draftData = {};
+            const prizes = [];
+            
+            for(let [key, value] of formData.entries()) {
+                if(key.startsWith('prize_position_')) {
+                    const index = key.split('_')[2];
+                    const amount = formData.get(`prize_amount_${index}`);
+                    prizes.push({ position: value, amount: amount });
+                } else {
+                    draftData[key] = value;
+                }
+            }
+            draftData.prizes = prizes;
+            
+            localStorage.setItem('tournamentDraft', JSON.stringify(draftData));
+            showMessage('ড্রাফট সফলভাবে সেভ হয়েছে!', 'success');
+        };
+
+        const handleLoadDraft = () => {
+            const savedDraft = localStorage.getItem('tournamentDraft');
+            if (!savedDraft) {
+                showMessage('কোনো সেভ করা ড্রাফট পাওয়া যায়নি।', 'info');
+                return;
+            }
+
+            const draftData = JSON.parse(savedDraft);
+            const form = document.getElementById('contest-post-form');
+
+            for (const key in draftData) {
+                if (key !== 'prizes' && form.elements[key]) {
+                    form.elements[key].value = draftData[key];
+                }
+            }
+
+            // Load prizes
+            const prizeContainer = document.getElementById('prize-list-container');
+            prizeContainer.innerHTML = ''; // Clear existing prize fields
+            if (draftData.prizes && draftData.prizes.length > 0) {
+                draftData.prizes.forEach(prize => {
+                    addPrizeField(prize.position, prize.amount);
+                });
+            } else {
+                // If no prizes in draft, add one empty field
+                addPrizeField('', '');
+            }
+            
+            showMessage('ড্রাফট সফলভাবে লোড হয়েছে।', 'success');
+        };
+        // END: Draft Functions Added
         
         const handleContestPost = async (e) => {
             e.preventDefault();
