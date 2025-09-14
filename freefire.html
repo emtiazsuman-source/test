@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Platform - খেলুন ও জিতুন</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        html, body {
+            overscroll-behavior-y: contain;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+        }
+        .app-container {
+            height: 100vh;
+        }
+        @media (min-width: 640px) {
+            .app-container {
+                height: 95vh;
+                max-height: 850px;
+            }
+        }
+        .modal {
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+            transform: translateY(20px) scale(0.95);
+        }
+        .modal.show .modal-content {
+            transform: translateY(0) scale(1);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container max-w-lg mx-auto bg-white shadow-lg flex flex-col rounded-b-xl sm:rounded-xl overflow-hidden">
+        <header class="bg-indigo-600 text-white p-4 flex items-center justify-between shadow-md">
+            <h1 class="text-xl font-bold">অ্যাডমিন প্যানেল</h1>
+            <button id="logout-btn" class="text-white hover:text-red-300">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 space-y-6">
+            <div id="admin-dashboard" class="space-y-4">
+                <button id="create-post-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    নতুন টুর্নামেন্ট পোস্ট করুন
+                </button>
+            </div>
+            
+            <div id="active-posts-container" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">সচল টুর্নামেন্ট</h2>
+                <div id="active-posts-list" class="space-y-4">
+                    </div>
+            </div>
+
+            <div id="hidden-posts-container" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">লুকানো টুর্নামেন্ট</h2>
+                <div id="hidden-posts-list" class="space-y-4">
+                    </div>
+            </div>
+
+            <div id="prizes-distributed-posts-container" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">পুরস্কার বিতরিত টুর্নামেন্ট</h2>
+                <div id="prizes-distributed-posts-list" class="space-y-4">
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="createPostModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 z-50 items-center justify-center">
+        <div class="modal-content bg-white rounded-lg p-6 w-11/12 max-w-md shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">নতুন পোস্ট তৈরি করুন</h3>
+                <button class="close-button text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <form id="create-post-form" class="space-y-4">
+                <div>
+                    <label for="contestName" class="block text-gray-700 font-bold mb-2">টুর্নামেন্টের নাম</label>
+                    <input type="text" id="contestName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="যেমন: Squad tournament #23" required>
+                </div>
+                <div>
+                    <label for="gameName" class="block text-gray-700 font-bold mb-2">গেমের নাম</label>
+                    <input type="text" id="gameName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="যেমন: Free Fire MAX" required>
+                </div>
+                <div>
+                    <label for="post-status" class="block text-gray-700 font-bold mb-2">পোস্ট স্ট্যাটাস (Post Status)</label>
+                    <select id="post-status" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="active">Active</option>
+                        <option value="hidden">Hidden</option>
+                        <option value="prizes_distributed">Prizes Distributed</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="totalPlayers" class="block text-gray-700 font-bold mb-2">মোট খেলোয়াড়</label>
+                    <input type="number" id="totalPlayers" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="perKill" class="block text-gray-700 font-bold mb-2">প্রতি কিল</label>
+                    <input type="number" id="perKill" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="pricepool" class="block text-gray-700 font-bold mb-2">প্রাইজপুল</label>
+                    <input type="number" id="pricepool" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="perHeadPrice" class="block text-gray-700 font-bold mb-2">প্রতি হেড প্রাইজ</label>
+                    <input type="number" id="perHeadPrice" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="map" class="block text-gray-700 font-bold mb-2">ম্যাপ</label>
+                    <input type="text" id="map" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="postImage" class="block text-gray-700 font-bold mb-2">পোস্টের ছবি (URL)</label>
+                    <input type="url" id="postImage" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="youtubeLink" class="block text-gray-700 font-bold mb-2">ইউটিউব লিংক</label>
+                    <input type="url" id="youtubeLink" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="postBody" class="block text-gray-700 font-bold mb-2">পোস্টের বিস্তারিত</label>
+                    <textarea id="postBody" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <div>
+                    <label for="prizeDetails" class="block text-gray-700 font-bold mb-2">পুরস্কারের বিস্তারিত (প্রতিটি পুরস্কার নতুন লাইনে)</label>
+                    <textarea id="prizeDetails" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    পোস্ট তৈরি করুন
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editPostModal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 z-50 items-center justify-center">
+        <div class="modal-content bg-white rounded-lg p-6 w-11/12 max-w-md shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">পোস্ট এডিট করুন</h3>
+                <button class="close-button text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+            </div>
+            <form id="edit-post-form" class="space-y-4">
+                <input type="hidden" id="edit-post-id">
+                <div>
+                    <label for="edit-contestName" class="block text-gray-700 font-bold mb-2">টুর্নামেন্টের নাম</label>
+                    <input type="text" id="edit-contestName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-gameName" class="block text-gray-700 font-bold mb-2">গেমের নাম</label>
+                    <input type="text" id="edit-gameName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-totalPlayers" class="block text-gray-700 font-bold mb-2">মোট খেলোয়াড়</label>
+                    <input type="number" id="edit-totalPlayers" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-perKill" class="block text-gray-700 font-bold mb-2">প্রতি কিল</label>
+                    <input type="number" id="edit-perKill" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-pricepool" class="block text-gray-700 font-bold mb-2">প্রাইজপুল</label>
+                    <input type="number" id="edit-pricepool" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-perHeadPrice" class="block text-gray-700 font-bold mb-2">প্রতি হেড প্রাইজ</label>
+                    <input type="number" id="edit-perHeadPrice" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-map" class="block text-gray-700 font-bold mb-2">ম্যাপ</label>
+                    <input type="text" id="edit-map" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-postImage" class="block text-gray-700 font-bold mb-2">পোস্টের ছবি (URL)</label>
+                    <input type="url" id="edit-postImage" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-youtubeLink" class="block text-gray-700 font-bold mb-2">ইউটিউব লিংক</label>
+                    <input type="url" id="edit-youtubeLink" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label for="edit-postBody" class="block text-gray-700 font-bold mb-2">পোস্টের বিস্তারিত</label>
+                    <textarea id="edit-postBody" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <div>
+                    <label for="edit-prizeDetails" class="block text-gray-700 font-bold mb-2">পুরস্কারের বিস্তারিত</label>
+                    <textarea id="edit-prizeDetails" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg shadow-md transition duration-300 ease-in-out">
+                    আপডেট করুন
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="message-toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold text-center z-50 transform transition-transform duration-300 translate-y-24 opacity-0"></div>
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-white mb-2"></div>
+            <p class="text-white text-lg">লোড হচ্ছে...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, serverTimestamp, query, where, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = firebaseConfig.appId;
+
+        const showMessage = (message, type) => {
+            const toast = document.getElementById('message-toast');
+            toast.textContent = message;
+            toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold text-center z-50 transform transition-transform duration-300 translate-y-0 opacity-100';
+            if (type === 'success') {
+                toast.style.backgroundColor = 'rgba(76, 175, 80, 0.9)';
+            } else {
+                toast.style.backgroundColor = 'rgba(244, 67, 54, 0.9)';
+            }
+            setTimeout(() => {
+                toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-bold text-center z-50 transform transition-transform duration-300 translate-y-24 opacity-0';
+            }, 3000);
+        };
+
+        const loadingEl = document.getElementById('loading-overlay');
+        const activePostsList = document.getElementById('active-posts-list');
+        const hiddenPostsList = document.getElementById('hidden-posts-list');
+        const prizesDistributedPostsList = document.getElementById('prizes-distributed-posts-list');
+        const editPostForm = document.getElementById('edit-post-form');
+
+        // Function to create post element
+        const createPostElement = (post, isPrizeDistributed = false) => {
+            const contestDetails = JSON.parse(post.contestDetails);
+            const statusBadgeColor = post.status === 'active' ? 'bg-green-500' : post.status === 'hidden' ? 'bg-red-500' : 'bg-yellow-500';
+            const postEl = document.createElement('div');
+            postEl.className = `p-4 bg-white rounded-lg shadow-md border-l-4 ${post.status === 'active' ? 'border-green-500' : post.status === 'hidden' ? 'border-red-500' : 'border-yellow-500'}`;
+            postEl.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-xs font-bold text-white px-2 py-1 rounded-full ${statusBadgeColor}">${post.status === 'active' ? 'Active' : post.status === 'hidden' ? 'Hidden' : 'Prizes Distributed'}</p>
+                    <div class="flex space-x-2">
+                        <button class="edit-btn text-blue-500 hover:text-blue-700" data-id="${post.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn text-red-500 hover:text-red-700" data-id="${post.id}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        ${!isPrizeDistributed ? `<button class="distribute-btn text-yellow-500 hover:text-yellow-700" data-id="${post.id}">
+                            <i class="fas fa-trophy"></i>
+                        </button>` : ''}
+                    </div>
+                </div>
+                <div class="flex items-start space-x-4">
+                    <img src="${contestDetails.postImage}" alt="Post Image" class="w-16 h-16 object-cover rounded-lg">
+                    <div>
+                        <p class="text-xl font-bold text-gray-800">${contestDetails.contestName}</p>
+                        <p class="text-sm font-medium text-gray-500">${contestDetails.gameName}</p>
+                        <p class="text-sm text-gray-600">মোট খেলোয়াড়: ${contestDetails.totalPlayers}</p>
+                    </div>
+                </div>
+            `;
+            return postEl;
+        };
+
+        // Function to render admin posts
+        const renderAdminPosts = (snapshot) => {
+            activePostsList.innerHTML = '';
+            hiddenPostsList.innerHTML = '';
+            prizesDistributedPostsList.innerHTML = '';
+            let activeCount = 0;
+            let hiddenCount = 0;
+            let prizesDistributedCount = 0;
+
+            snapshot.forEach(doc => {
+                const post = { id: doc.id, ...doc.data() };
+                const postData = JSON.parse(post.contestDetails);
+
+                if (post.status === 'active') {
+                    activePostsList.appendChild(createPostElement(post));
+                    activeCount++;
+                } else if (post.status === 'hidden') {
+                    hiddenPostsList.appendChild(createPostElement(post));
+                    hiddenCount++;
+                } else if (post.status === 'prizes_distributed') {
+                    prizesDistributedPostsList.appendChild(createPostElement(post, true));
+                    prizesDistributedCount++;
+                }
+            });
+
+            if (activeCount === 0) {
+                activePostsList.innerHTML = '<p class="text-center text-gray-500">কোনো পোস্ট নেই।</p>';
+            }
+            if (hiddenCount === 0) {
+                hiddenPostsList.innerHTML = '<p class="text-center text-gray-500">কোনো লুকানো পোস্ট নেই।</p>';
+            }
+            if (prizesDistributedCount === 0) {
+                prizesDistributedPostsList.innerHTML = '<p class="text-center text-gray-500">কোনো পুরস্কার বিতরিত পোস্ট নেই।</p>';
+            }
+
+            document.querySelectorAll('.edit-btn').forEach(button => button.onclick = handleEditPost);
+            document.querySelectorAll('.delete-btn').forEach(button => button.onclick = handleDeletePost);
+            document.querySelectorAll('.distribute-btn').forEach(button => button.onclick = handleDistributePrizes);
+        };
+
+        // Function to listen for posts (for users)
+        const listenForPosts = () => {
+            const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
+            const q = query(postsRef, where('status', '==', 'active'));
+            onSnapshot(q, (snapshot) => {
+                // This section is for user view, not relevant for admin panel
+                // The admin panel will use renderAdminPosts instead.
+            });
+        };
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'users', user.uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.role === 'admin') {
+                        // Admin view
+                        const postsRef = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
+                        onSnapshot(postsRef, renderAdminPosts);
+                    } else {
+                        // User view
+                        listenForPosts();
+                    }
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Modal functionality
+        const createPostModal = document.getElementById('createPostModal');
+        const createPostBtn = document.getElementById('create-post-btn');
+        const closeButtons = document.querySelectorAll('.close-button');
+
+        createPostBtn.onclick = () => createPostModal.classList.add('show');
+        closeButtons.forEach(btn => {
+            btn.onclick = () => btn.closest('.modal').classList.remove('show');
+        });
+
+        // Form submission handlers
+        const handleContestPost = async (e) => {
+            e.preventDefault();
+            loadingEl.classList.remove('hidden');
+
+            const contestName = document.getElementById('contestName').value;
+            const gameName = document.getElementById('gameName').value;
+            const totalPlayers = document.getElementById('totalPlayers').value;
+            const perKill = document.getElementById('perKill').value;
+            const pricepool = document.getElementById('pricepool').value;
+            const perHeadPrice = document.getElementById('perHeadPrice').value;
+            const map = document.getElementById('map').value;
+            const postImage = document.getElementById('postImage').value;
+            const youtubeLink = document.getElementById('youtubeLink').value;
+            const postBody = document.getElementById('postBody').value;
+            const prizeDetails = document.getElementById('prizeDetails').value;
+            const status = document.getElementById('post-status').value; // Get the status value
+
+            const contestDetails = {
+                contestName,
+                gameName,
+                totalPlayers,
+                perKill,
+                pricepool,
+                perHeadPrice,
+                map,
+                postImage,
+                youtubeLink,
+                postBody,
+                prizeDetails
+            };
+
+            const postData = {
+                contestDetails: JSON.stringify(contestDetails),
+                timestamp: serverTimestamp(),
+                status: status, // Add the status to the post data
+                prizes: prizeDetails.split('\n').filter(p => p.trim() !== '')
+            };
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'posts'), postData);
+                showMessage('পোস্ট সফলভাবে তৈরি করা হয়েছে!', 'success');
+                document.getElementById('create-post-form').reset();
+                createPostModal.classList.remove('show');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        };
+
+        document.getElementById('create-post-form').addEventListener('submit', handleContestPost);
+
+        const handleEditPost = async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            const postDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId));
+            if (postDoc.exists()) {
+                const post = { id: postDoc.id, ...postDoc.data() };
+                const contestDetails = JSON.parse(post.contestDetails);
+
+                document.getElementById('edit-post-id').value = post.id;
+                document.getElementById('edit-contestName').value = contestDetails.contestName;
+                document.getElementById('edit-gameName').value = contestDetails.gameName;
+                document.getElementById('edit-totalPlayers').value = contestDetails.totalPlayers;
+                document.getElementById('edit-perKill').value = contestDetails.perKill;
+                document.getElementById('edit-pricepool').value = contestDetails.pricepool;
+                document.getElementById('edit-perHeadPrice').value = contestDetails.perHeadPrice;
+                document.getElementById('edit-map').value = contestDetails.map;
+                document.getElementById('edit-postImage').value = contestDetails.postImage;
+                document.getElementById('edit-youtubeLink').value = contestDetails.youtubeLink;
+                document.getElementById('edit-postBody').value = contestDetails.postBody;
+                document.getElementById('edit-prizeDetails').value = post.prizes ? post.prizes.join('\n') : '';
+
+                document.getElementById('editPostModal').classList.add('show');
+            }
+        };
+
+        editPostForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const postId = document.getElementById('edit-post-id').value;
+            const updatedDetails = {
+                contestName: document.getElementById('edit-contestName').value,
+                gameName: document.getElementById('edit-gameName').value,
+                totalPlayers: document.getElementById('edit-totalPlayers').value,
+                perKill: document.getElementById('edit-perKill').value,
+                pricepool: document.getElementById('edit-pricepool').value,
+                perHeadPrice: document.getElementById('edit-perHeadPrice').value,
+                map: document.getElementById('edit-map').value,
+                postImage: document.getElementById('edit-postImage').value,
+                youtubeLink: document.getElementById('edit-youtubeLink').value,
+                postBody: document.getElementById('edit-postBody').value,
+            };
+            const prizes = document.getElementById('edit-prizeDetails').value.split('\n').filter(p => p.trim() !== '');
+
+            loadingEl.classList.remove('hidden');
+            try {
+                const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId);
+                await updateDoc(postRef, {
+                    contestDetails: JSON.stringify(updatedDetails),
+                    prizes: prizes
+                });
+                showMessage('টুর্নামেন্ট সফলভাবে আপডেট করা হয়েছে!', 'success');
+                document.getElementById('editPostModal').classList.remove('show');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        };
+
+        const handleDeletePost = async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            if (confirm('আপনি কি নিশ্চিতভাবে এই পোস্টটি মুছে ফেলতে চান? এটি ফেরত আনা যাবে না।')) {
+                loadingEl.classList.remove('hidden');
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId));
+                    showMessage('পোস্ট সফলভাবে মুছে ফেলা হয়েছে।', 'success');
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                } finally {
+                    loadingEl.classList.add('hidden');
+                }
+            }
+        };
+
+        const handleDistributePrizes = async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            if (confirm('আপনি কি নিশ্চিত যে এই পোস্টের পুরস্কার বিতরণ করা হয়েছে?')) {
+                loadingEl.classList.remove('hidden');
+                try {
+                    const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId);
+                    await updateDoc(postRef, { status: 'prizes_distributed' });
+                    showMessage('পোস্টটি পুরস্কার বিতরিত হিসেবে চিহ্নিত করা হয়েছে।', 'success');
+                } catch (error) {
+                    showMessage(error.message, 'error');
+                } finally {
+                    loadingEl.classList.add('hidden');
+                }
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+    </script>
+</body>
+</html>
