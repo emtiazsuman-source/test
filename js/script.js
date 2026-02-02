@@ -1,24 +1,40 @@
-document.getElementById('browseBtn').addEventListener('click', loadWebsite);
+const inputField = document.getElementById('urlInput');
+const browseBtn = document.getElementById('browseBtn');
+const viewer = document.getElementById('viewer');
+const loader = document.getElementById('loader');
+
+// বাটনে ক্লিক করলে
+browseBtn.addEventListener('click', loadWebsite);
+
+// কীবোর্ডের Enter চাপলে
+inputField.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        loadWebsite();
+    }
+});
 
 function loadWebsite() {
-    const inputUrl = document.getElementById('urlInput').value;
-    const viewer = document.getElementById('viewer');
+    let url = inputField.value.trim();
 
-    if (!inputUrl) {
-        alert("দয়া করে একটি URL দিন!");
-        return;
+    if (!url) return;
+
+    // লোডার দেখানো
+    loader.style.display = 'block';
+    viewer.style.opacity = '0.5'; // লোডিং এর সময় একটু ঝাপসা হবে
+
+    // http যুক্ত করা
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
     }
 
-    // ইউআরএল ভ্যালিডেশন (http/https না থাকলে যোগ করে নেয়া)
-    let formattedUrl = inputUrl;
-    if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
-        formattedUrl = 'https://' + inputUrl;
-    }
-
-    // আমাদের Vercel API কে কল করা হচ্ছে
-    // এখানে '/api/proxy' হলো আমাদের ব্যাকএন্ড ফাংশন
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(formattedUrl)}`;
-
-    // আইফ্রেমে লোড করা
+    // Vercel API কল
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+    
     viewer.src = proxyUrl;
 }
+
+// আইফ্রেম লোড শেষ হলে লোডার বন্ধ করা
+viewer.onload = function() {
+    loader.style.display = 'none';
+    viewer.style.opacity = '1';
+};
