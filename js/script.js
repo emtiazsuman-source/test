@@ -1,41 +1,47 @@
-const axios = require('axios');
+const urlInput = document.getElementById('urlInput');
+const browseBtn = document.getElementById('browseBtn');
+const viewer = document.getElementById('viewer');
+const loader = document.getElementById('loader');
 
-export default async function handler(req, res) {
-    const targetUrl = req.query.url;
+// প্রক্সি ফাংশন
+function loadSite() {
+    let url = urlInput.value.trim();
 
-    if (!targetUrl) {
-        return res.status(400).send('URL is required');
+    if (!url) {
+        alert("দয়া করে একটি URL লিখুন!");
+        return;
     }
 
-    try {
-        const response = await axios.get(targetUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-                'Accept-Language': 'en-US,en;q=0.9',
-            },
-            responseType: 'text',
-            validateStatus: () => true
-        });
-
-        // ব্রাউজারকে বিভ্রান্ত করতে সিকিউরিটি হেডারগুলো ডিলিট করা
-        const headers = { ...response.headers };
-        delete headers['x-frame-options'];
-        delete headers['content-security-policy'];
-        delete headers['content-security-policy-report-only'];
-        delete headers['cross-origin-resource-policy'];
-
-        res.set(headers);
-        
-        // HTML এর ভেতরের লিঙ্কগুলোকে কিছুটা মডিফাই করার চেষ্টা (ঐচ্ছিক কিন্তু কার্যকরী)
-        let html = response.data;
-        if (typeof html === 'string') {
-            // এটি গুগলকে আইফ্রেম ডিটেক্ট করতে কিছুটা বাধা দেয়
-            html = html.replace(/window\.top === window\.self/g, 'true');
-            html = html.replace(/if\(top!==self\)/g, 'if(false)');
-        }
-
-        res.status(response.status).send(html);
-    } catch (error) {
-        res.status(500).send(`Error fetching the site: ${error.message}`);
+    // যদি ইউজার http বা https না লেখে
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
     }
+
+    // লোডার অন করা
+    loader.style.display = 'block';
+    viewer.style.opacity = '0'; // লোড হওয়ার আগে লুকিয়ে রাখা
+
+    // প্রক্সি সার্ভারের ঠিকানা (আপনার Vercel বা লোকাল সার্ভার পাথ)
+    // নিশ্চিত করুন আপনার ব্যাকএন্ড 'api/proxy.js' এ আছে
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+
+    // আইফ্রেমে লোড করা
+    viewer.src = proxyUrl;
 }
+
+// লোড শেষ হলে
+viewer.onload = function() {
+    loader.style.display = 'none';
+    viewer.style.opacity = '1';
+    console.log("Iframe loaded successfully via proxy.");
+};
+
+// বাটন ক্লিক ইভেন্ট
+browseBtn.addEventListener('click', loadSite);
+
+// এন্টার বাটন চাপলে কাজ করবে
+urlInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        loadSite();
+    }
+});
