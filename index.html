@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Proxy Browser</title>
+    <title>Super Proxy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,19 +17,18 @@
                 <span class="dot green"></span>
             </div>
             <div class="address-bar">
-                <i class="fas fa-shield-alt lock-icon"></i>
+                <i class="fas fa-lock lock-icon"></i>
                 <input type="text" id="urlInput" placeholder="URL লিখুন (যেমন: google.com)...">
-                <button id="browseBtn"><i class="fas fa-arrow-right"></i></button>
+                <button id="browseBtn"><i class="fas fa-search"></i></button>
             </div>
         </div>
 
         <div id="loader" class="loader-container" style="display: none;">
             <div class="spinner"></div>
-            <p>নিরাপদে লোড হচ্ছে...</p>
+            <p>লোড হচ্ছে...</p>
         </div>
 
         <div class="browser-content">
-            <!-- Sandbox যোগ করা হয়েছে নিরাপত্তার জন্য -->
             <iframe id="viewer" title="Website Viewer" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
         </div>
     </div>
