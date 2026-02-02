@@ -10,8 +10,6 @@
 <body>
 
     <div class="browser-window">
-        
-        <!-- ব্রাউজার হেডার -->
         <div class="browser-header">
             <div class="dots">
                 <span class="dot red"></span>
@@ -19,24 +17,20 @@
                 <span class="dot green"></span>
             </div>
             <div class="address-bar">
-                <i class="fas fa-lock lock-icon"></i>
+                <i class="fas fa-shield-alt lock-icon"></i>
                 <input type="text" id="urlInput" placeholder="URL লিখুন (যেমন: google.com)...">
-                <button id="browseBtn"><i class="fas fa-arrow-right"></i></button>
+                <button id="browseBtn"><i class="fas fa-search"></i></button>
             </div>
         </div>
 
-        <!-- লোডিং স্ক্রিন -->
         <div id="loader" class="loader-container" style="display: none;">
             <div class="spinner"></div>
-            <p>সাইট লোড হচ্ছে...</p>
+            <p>নিরাপদে লোড হচ্ছে...</p>
         </div>
 
-        <!-- মেইন ভিউয়ার -->
         <div class="browser-content">
-            <!-- sandbox অ্যাট্রিবিউট খুবই গুরুত্বপূর্ণ -->
-            <iframe id="viewer" title="Website Viewer" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-modals allow-presentation"></iframe>
+            <iframe id="viewer" title="Website Viewer" sandbox="allow-forms allow-scripts allow-same-origin allow-popups"></iframe>
         </div>
-
     </div>
 
     <script src="js/script.js"></script>
