@@ -3,10 +3,8 @@ const browseBtn = document.getElementById('browseBtn');
 const viewer = document.getElementById('viewer');
 const loader = document.getElementById('loader');
 
-// বাটনে ক্লিক করলে
 browseBtn.addEventListener('click', loadWebsite);
 
-// কীবোর্ডের Enter চাপলে
 inputField.addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
         loadWebsite();
@@ -14,26 +12,34 @@ inputField.addEventListener('keypress', function (e) {
 });
 
 function loadWebsite() {
-    let url = inputField.value.trim();
+    let query = inputField.value.trim();
+    if (!query) return;
 
-    if (!url) return;
-
-    // লোডার দেখানো
     loader.style.display = 'block';
-    viewer.style.opacity = '0.5'; // লোডিং এর সময় একটু ঝাপসা হবে
+    viewer.style.opacity = '0.5';
 
-    // http যুক্ত করা
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
+    let finalUrl = "";
+
+    // চেক করা হচ্ছে এটা কি URL নাকি সাধারণ লেখা (Search Term)
+    const urlPattern = /^(http|https):\/\/[^ "]+$|.*?\..*?/; 
+    
+    if (urlPattern.test(query)) {
+        // যদি URL হয় (যেমন: example.com)
+        if (!query.startsWith('http://') && !query.startsWith('https://')) {
+            finalUrl = 'https://' + query;
+        } else {
+            finalUrl = query;
+        }
+    } else {
+        // যদি সাধারণ লেখা হয়, তবে Google Search-এ পাঠাবে
+        finalUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
     }
 
-    // Vercel API কল
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
-    
+    // প্রক্সি সার্ভারের মাধ্যমে লোড করা
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(finalUrl)}`;
     viewer.src = proxyUrl;
 }
 
-// আইফ্রেম লোড শেষ হলে লোডার বন্ধ করা
 viewer.onload = function() {
     loader.style.display = 'none';
     viewer.style.opacity = '1';
