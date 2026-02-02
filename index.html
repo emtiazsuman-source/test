@@ -11,6 +11,7 @@
 
     <div class="browser-window">
         
+        <!-- ব্রাউজার হেডার -->
         <div class="browser-header">
             <div class="dots">
                 <span class="dot red"></span>
@@ -19,18 +20,21 @@
             </div>
             <div class="address-bar">
                 <i class="fas fa-lock lock-icon"></i>
-                <input type="text" id="urlInput" placeholder="URL লিখুন (যেমন: wikipedia.org)...">
+                <input type="text" id="urlInput" placeholder="URL লিখুন (যেমন: google.com)...">
                 <button id="browseBtn"><i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
 
+        <!-- লোডিং স্ক্রিন -->
         <div id="loader" class="loader-container" style="display: none;">
             <div class="spinner"></div>
-            <p>লোড হচ্ছে...</p>
+            <p>সাইট লোড হচ্ছে...</p>
         </div>
 
+        <!-- মেইন ভিউয়ার -->
         <div class="browser-content">
-            <iframe id="viewer" title="Website Viewer"></iframe>
+            <!-- sandbox অ্যাট্রিবিউট খুবই গুরুত্বপূর্ণ -->
+            <iframe id="viewer" title="Website Viewer" sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-modals allow-presentation"></iframe>
         </div>
 
     </div>
@@ -38,3 +42,4 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+
