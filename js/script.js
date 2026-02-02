@@ -1,46 +1,41 @@
-const inputField = document.getElementById('urlInput');
-const browseBtn = document.getElementById('browseBtn');
-const viewer = document.getElementById('viewer');
-const loader = document.getElementById('loader');
+const axios = require('axios');
 
-browseBtn.addEventListener('click', loadWebsite);
+export default async function handler(req, res) {
+    const targetUrl = req.query.url;
 
-inputField.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        loadWebsite();
+    if (!targetUrl) {
+        return res.status(400).send('URL is required');
     }
-});
 
-function loadWebsite() {
-    let query = inputField.value.trim();
-    if (!query) return;
+    try {
+        const response = await axios.get(targetUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9',
+            },
+            responseType: 'text',
+            validateStatus: () => true
+        });
 
-    loader.style.display = 'block';
-    viewer.style.opacity = '0.5';
+        // ব্রাউজারকে বিভ্রান্ত করতে সিকিউরিটি হেডারগুলো ডিলিট করা
+        const headers = { ...response.headers };
+        delete headers['x-frame-options'];
+        delete headers['content-security-policy'];
+        delete headers['content-security-policy-report-only'];
+        delete headers['cross-origin-resource-policy'];
 
-    let finalUrl = "";
-
-    // চেক করা হচ্ছে এটা কি URL নাকি সাধারণ লেখা (Search Term)
-    const urlPattern = /^(http|https):\/\/[^ "]+$|.*?\..*?/; 
-    
-    if (urlPattern.test(query)) {
-        // যদি URL হয় (যেমন: example.com)
-        if (!query.startsWith('http://') && !query.startsWith('https://')) {
-            finalUrl = 'https://' + query;
-        } else {
-            finalUrl = query;
+        res.set(headers);
+        
+        // HTML এর ভেতরের লিঙ্কগুলোকে কিছুটা মডিফাই করার চেষ্টা (ঐচ্ছিক কিন্তু কার্যকরী)
+        let html = response.data;
+        if (typeof html === 'string') {
+            // এটি গুগলকে আইফ্রেম ডিটেক্ট করতে কিছুটা বাধা দেয়
+            html = html.replace(/window\.top === window\.self/g, 'true');
+            html = html.replace(/if\(top!==self\)/g, 'if(false)');
         }
-    } else {
-        // যদি সাধারণ লেখা হয়, তবে Google Search-এ পাঠাবে
-        finalUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+
+        res.status(response.status).send(html);
+    } catch (error) {
+        res.status(500).send(`Error fetching the site: ${error.message}`);
     }
-
-    // প্রক্সি সার্ভারের মাধ্যমে লোড করা
-    const proxyUrl = `/api/proxy?url=${encodeURIComponent(finalUrl)}`;
-    viewer.src = proxyUrl;
 }
-
-viewer.onload = function() {
-    loader.style.display = 'none';
-    viewer.style.opacity = '1';
-};
