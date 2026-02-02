@@ -1,78 +1,144 @@
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-
-body {
-    background: #f0f2f5;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+/* রিসেট এবং গ্লোবাল স্টাইল */
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
 }
 
+body {
+    background: #e0e5ec;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 10px; /* মোবাইলের জন্য প্যাডিং কমানো হয়েছে */
+    overflow: hidden;
+}
+
+/* ব্রাউজার উইন্ডো */
 .browser-window {
     width: 100%;
     max-width: 1100px;
-    height: 85vh;
+    height: 90vh;
     background: #fff;
     border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
+/* ব্রাউজার হেডার - এটি ফিক্সড থাকবে */
 .browser-header {
-    background: #e4e6eb;
-    padding: 12px 18px;
+    background: #f1f3f4;
+    padding: 10px 15px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #ddd;
+    gap: 12px;
+    flex-shrink: 0; /* হেডার যেন সংকুচিত না হয় */
 }
 
-.dots { display: flex; gap: 6px; }
+/* উইন্ডো ডটস (মোবাইলে লুকানো থাকবে জায়গা বাঁচাতে) */
+.dots { 
+    display: flex; 
+    gap: 6px; 
+}
 .dot { width: 12px; height: 12px; border-radius: 50%; }
-.red { background: #ff5f57; }
-.yellow { background: #febc2e; }
-.green { background: #28c840; }
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
 
+/* এড্রেস বার কন্টেইনার */
 .address-bar {
     flex: 1;
     background: #fff;
-    padding: 8px 15px;
-    border-radius: 30px;
+    border-radius: 20px;
+    padding: 5px 12px;
     display: flex;
     align-items: center;
     border: 1px solid #ddd;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    min-width: 0; /* ফ্লেক্স চাইল্ড ওভারফ্লো প্রতিরোধে */
 }
 
-.address-bar input {
-    flex: 1;
+.address-bar:focus-within {
+    border-color: #0070f3;
+}
+
+.lock-icon { 
+    color: #34a853; 
+    font-size: 13px; 
+    margin-right: 8px; 
+}
+
+/* ইনপুট বক্স */
+input {
     border: none;
     outline: none;
-    margin: 0 10px;
-    font-size: 15px;
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
 }
 
-#browseBtn {
-    background: #1877f2;
+/* গো (Go) বাটন - এটি এখন সবসময় দৃশ্যমান থাকবে */
+button {
+    background: #0070f3;
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 32px;
+    min-width: 32px; /* ফিক্সড সাইজ */
     height: 32px;
+    border-radius: 50%;
     cursor: pointer;
+    margin-left: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: 0.2s;
+    transition: 0.2s ease;
+    flex-shrink: 0; /* বাটন যেন ছোট না হয়ে যায় */
 }
 
-#browseBtn:hover { background: #166fe5; }
+button:hover { 
+    background: #005bb5; 
+    transform: scale(1.05); 
+}
 
+button i {
+    font-size: 14px;
+}
+
+/* লোডার */
+.loader-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    background: rgba(255,255,255,0.8);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.spinner {
+    width: 35px;
+    height: 35px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0070f3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* কন্টেন্ট এরিয়া */
 .browser-content {
     flex: 1;
     position: relative;
+    background: #fff;
 }
 
 iframe {
@@ -81,23 +147,29 @@ iframe {
     border: none;
 }
 
-.loader-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 10;
+/* রেসপন্সিভ ডিজাইন (মোবাইল ফোনের জন্য) */
+@media (max-width: 600px) {
+    body {
+        padding: 0;
+    }
+    .browser-window {
+        height: 100vh;
+        border-radius: 0;
+    }
+    .dots {
+        display: none; /* মোবাইলে ডটস লুকানো হয়েছে */
+    }
+    .browser-header {
+        padding: 8px 10px;
+    }
+    .address-bar {
+        padding: 4px 10px;
+    }
+    input {
+        font-size: 13px;
+    }
+    button {
+        width: 30px;
+        height: 30px;
+    }
 }
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #1877f2;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
-}
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
