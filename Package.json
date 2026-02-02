@@ -1,8 +1,12 @@
 {
-  "name": "super-proxy-browser",
+  "name": "proxy-browser",
   "version": "1.0.0",
+  "description": "A proxy browser to load blocked sites",
   "main": "index.html",
   "dependencies": {
-    "axios": "^1.6.2"
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
