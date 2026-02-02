@@ -1,0 +1,131 @@
+/* রিসেট এবং ফন্ট */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body {
+    background: #e0e5ec;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* ব্রাউজার উইন্ডো ফ্রেম */
+.browser-window {
+    width: 100%;
+    max-width: 1000px;
+    height: 90vh;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* হেডার সেকশন */
+.browser-header {
+    background: #f1f3f4;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    gap: 15px;
+}
+
+/* ম্যাক স্টাইল বাটন */
+.dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+/* এড্রেস বার */
+.address-bar {
+    flex-grow: 1;
+    background: #fff;
+    border-radius: 20px;
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid transparent;
+    transition: 0.3s;
+}
+
+.address-bar:focus-within {
+    border-color: #0070f3;
+    box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
+}
+
+.lock-icon { color: #5f6368; font-size: 14px; margin-right: 10px; }
+
+input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 16px;
+    color: #333;
+}
+
+button {
+    background: #0070f3;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover { background: #005bb5; transform: scale(1.05); }
+
+/* কন্টেন্ট এরিয়া */
+.browser-content {
+    flex-grow: 1;
+    position: relative;
+    background: white;
+}
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* লোডিং এনিমেশন */
+.loader-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0070f3;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* মোবাইল রেস্পন্সিভ */
+@media (max-width: 600px) {
+    body { padding: 0; }
+    .browser-window { height: 100vh; border-radius: 0; }
+    .dots { display: none; } /* মোবাইলে ডট লুকানো থাকবে */
+}
