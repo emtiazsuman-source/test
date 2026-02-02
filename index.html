@@ -3,26 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আমার প্রক্সি ব্রাউজার</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; text-align: center; }
-        .search-box { margin-bottom: 20px; }
-        input { padding: 10px; width: 300px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background: #0070f3; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #005bb5; }
-        iframe { width: 100%; height: 80vh; border: 1px solid #ddd; background: #f9f9f9; }
-    </style>
+    <title>Super Proxy Browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <h1>ওয়েব প্রক্সি ব্রাউজার</h1>
-    
-    <div class="search-box">
-        <input type="text" id="urlInput" placeholder="https://example.com লিখুন...">
-        <button id="browseBtn">ব্রাউজ করুন</button>
-    </div>
+    <div class="browser-window">
+        
+        <div class="browser-header">
+            <div class="dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <div class="address-bar">
+                <i class="fas fa-lock lock-icon"></i>
+                <input type="text" id="urlInput" placeholder="URL লিখুন (যেমন: wikipedia.org)...">
+                <button id="browseBtn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
 
-    <iframe id="viewer" title="Website Viewer"></iframe>
+        <div id="loader" class="loader-container" style="display: none;">
+            <div class="spinner"></div>
+            <p>লোড হচ্ছে...</p>
+        </div>
+
+        <div class="browser-content">
+            <iframe id="viewer" title="Website Viewer"></iframe>
+        </div>
+
+    </div>
 
     <script src="js/script.js"></script>
 </body>
