@@ -7,7 +7,10 @@ function handleBrowse() {
     let url = urlInput.value.trim();
     if (!url) return;
 
-    if (!url.startsWith('http')) {
+    // URL না হলে গুগলে সার্চ করা
+    if (!isValidUrl(url)) {
+        url = `https://www.google.com/search?q=${encodeURIComponent(url)}`;
+    } else if (!url.startsWith('http')) {
         url = 'https://' + url;
     }
 
@@ -16,6 +19,16 @@ function handleBrowse() {
     
     // Vercel এর API কল করা
     viewer.src = `/api/proxy?url=${encodeURIComponent(url)}`;
+}
+
+// URL টেস্ট করার ফাংশন
+function isValidUrl(string) {
+    try {
+        const url = new URL(string.startsWith('http') ? string : 'https://' + string);
+        return url.hostname.includes('.') && !url.hostname.includes(' ');
+    } catch (_) {
+        return false;
+    }
 }
 
 viewer.onload = () => {
