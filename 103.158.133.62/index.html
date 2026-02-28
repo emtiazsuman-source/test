@@ -312,6 +312,13 @@
         var player;
         var savedVolume = 50; 
 
+        function toProxyUrl(url) {
+            if (!url || typeof url !== 'string') return url;
+            if (/^\/api\/proxy\?url=/.test(url)) return url;
+            if (!/^https?:\/\//i.test(url)) return url;
+            return '/api/proxy?url=' + encodeURIComponent(url);
+        }
+
         function applyVolume() {
             if (player) {
                
@@ -354,15 +361,17 @@
         function loadM3U8(url) {
             document.getElementById('wel-iframe').style.display = 'none';
             document.getElementById('clappr-player').style.display = 'block';
+
+            var proxiedUrl = toProxyUrl(url);
             
             var btn = document.getElementById('screenshot-btn');
             btn.style.display = 'flex';
             btn.classList.add('active');
 
             if (!player) {
-                initPlayer(url);
+                initPlayer(proxiedUrl);
             } else {
-                player.load(url);
+                player.load(proxiedUrl);
                 player.play();
                 setTimeout(applyVolume, 200);
             }
