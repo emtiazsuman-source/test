@@ -1,9 +1,0 @@
-{
-  "name": "super-proxy-browser",
-  "version": "1.0.0",
-  "description": "A high-performance proxy for Vercel Free Plan",
-  "main": "index.html",
-  "dependencies": {
-    "axios": "^1.6.7"
-  }
-}
