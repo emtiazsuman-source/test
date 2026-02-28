@@ -368,8 +368,13 @@
             try {
                 if (typeof url === 'string' && url.indexOf('://') !== -1) {
                     var u = new URL(url);
+                    if (window.location.protocol === 'https:' && u.protocol === 'http:') {
+                        u.protocol = 'https:';
+                    }
                     if (u.hostname === '103.158.133.62' || u.hostname === '103.134.28.242') {
                         u.hostname = window.location.hostname;
+                        url = u.toString();
+                    } else {
                         url = u.toString();
                     }
                 }
