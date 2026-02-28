@@ -15,7 +15,20 @@
     <link href="css/video-js.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
-    <script type="text/javascript" src="../cdn.jsdelivr.net/npm/clappr%40latest/dist/clappr.min.js"></script>
+    <script>
+        (function() {
+            var s = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src = 'https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js';
+            s.onerror = function() {
+                var s2 = document.createElement('script');
+                s2.type = 'text/javascript';
+                s2.src = '../cdn.jsdelivr.net/npm/clappr%40latest/dist/clappr.min.js';
+                document.head.appendChild(s2);
+            };
+            document.head.appendChild(s);
+        })();
+    </script>
 
     <style class="clappr-style">
         @media all and (min-width: 992px) {
@@ -352,6 +365,17 @@
         }
 
         function loadM3U8(url) {
+            try {
+                if (typeof url === 'string' && url.indexOf('://') !== -1) {
+                    var u = new URL(url);
+                    if (u.hostname === '103.158.133.62' || u.hostname === '103.134.28.242') {
+                        u.hostname = window.location.hostname;
+                        url = u.toString();
+                    }
+                }
+            } catch (e) {
+            }
+
             document.getElementById('wel-iframe').style.display = 'none';
             document.getElementById('clappr-player').style.display = 'block';
             
