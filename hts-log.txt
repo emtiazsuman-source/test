@@ -1,0 +1,20 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sat, 28 Feb 2026 14:51:12 at http://103.158.133.62/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" http://103.158.133.62/ -O1 "C:\Users\USER\Downloads\aa" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+14:51:35	Warning: 	Retry after error -4 (No data (connection closed)) at link 103.158.133.62/ (from primary/primary)
+15:07:19	Warning: 	Retry after error -4 (No data (connection closed)) at link 103.158.133.62/css/bootstrap.min.css (from 103.158.133.62/)
+15:07:22	Warning: 	Retry after error -2 (Receive Time Out) at link https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js (from 103.158.133.62/)
+15:07:24	Warning: 	Retry after error -2 (Receive Time Out) at link 103.158.133.62/IPTV.apk (from 103.158.133.62/)
+15:07:46	Warning: 	Retry after error -2 (Receive Time Out) at link 103.158.133.62/assets/images/b4umovie.png (from 103.158.133.62/)
+15:07:48	Warning: 	Retry after error -2 (Receive Time Out) at link 103.158.133.62/assets/images/b4umusic.png (from 103.158.133.62/)
+15:07:50	Warning: 	Retry after error -2 (Receive Time Out) at link 103.158.133.62/assets/images/masti.png (from 103.158.133.62/)
+15:07:52	Error: 	"Not Found" (404) at link 103.158.133.62/img/bgu.jpg (from 103.158.133.62/css/style.css)
+15:08:50	Error: 	"Cancelled by User" (-1) at link 103.158.133.62/IPTV.apk (from 103.158.133.62/)
+
+HTTrack Website Copier/3.49-2 mirror complete in 17 minutes 38 seconds : 137 links scanned, 127 files written (8370458 bytes overall) [9325132 bytes received at 8813 bytes/sec], 559045 bytes transferred using HTTP compression in 3 files, ratio 26%
+(2 errors, 7 warnings, 0 messages)
